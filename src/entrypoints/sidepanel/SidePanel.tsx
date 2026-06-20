@@ -224,7 +224,7 @@ export function SidePanel() {
   useEffect(() => {
     // Check if there was an active capture we missed due to race condition
     chrome.storage.local.get(['activeCaptureSourceId']).then((res) => {
-      if (res.activeCaptureSourceId) {
+      if (typeof res.activeCaptureSourceId === 'string') {
          setSourceId(res.activeCaptureSourceId);
          setView('capture');
       }
