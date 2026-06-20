@@ -73,6 +73,9 @@ export default defineBackground(() => {
              deckId = newDeck.id;
           }
           
+          // Let the side panel know that capture is complete
+          chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
+
           return ok(source);
 
         } catch (e) {
@@ -106,6 +109,9 @@ export default defineBackground(() => {
             await deckRepo.create({ name: sourceName, sourceId: source.id });
         }
         
+        // Let the side panel know that capture is complete
+        chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
+
         return ok(source);
       }
 
@@ -124,6 +130,30 @@ export default defineBackground(() => {
         return ok(deck);
       }
 
+      case 'cards.save': {
+        const { cardRepo } = await import('@/data/repositories');
+        
+        try {
+          const cardsToCreate = msg.payload.cards.map((c: any) => ({
+             deckId: msg.payload.deckId,
+             type: c.type || 'basic',
+             front: c.front,
+             back: c.back,
+             clozeText: c.clozeText,
+             choices: c.choices,
+             answerIndex: c.answerIndex,
+             tags: c.tags || [],
+             suspended: false
+          }));
+
+          for (const card of cardsToCreate) {
+             await cardRepo.create(card);
+          }
+          return ok({ count: cardsToCreate.length });
+        } catch(e) {
+           return err('UNKNOWN', `Failed to save cards: ${String(e)}`);
+        }
+      }
       case 'generate.cards': {
         const provider = await getProvider();
         if (!provider) return err('NO_MODEL_CONFIG', 'No model configured.');
@@ -132,16 +162,32 @@ export default defineBackground(() => {
           const source = await sourceRepo.getById(msg.payload.sourceId);
           if (!source?.rawText) return err('EXTRACTION_EMPTY', 'No content found for this source.');
 
+          // Simple chunking logic if text is too large
+          // A naive assumption: 1 token ~= 4 characters. We don't want to exceed context limits,
+          // so chunk rawText into pieces of ~10,000 characters if it's very large.
+          const maxCharLimit = 10000;
+          let textToProcess = source.rawText;
+          if (textToProcess.length > maxCharLimit) {
+            console.warn(`Text length ${textToProcess.length} exceeds limits, chunking...`);
+            // We just take the first chunk for now in M1 to simplify,
+            // later we could process in parallel and map-reduce.
+            textToProcess = textToProcess.substring(0, maxCharLimit);
+          }
+
           const cards = await provider.generateCards({
-            text: source.rawText,
+            text: textToProcess,
             title: source.title,
             url: source.url,
             options: msg.payload.options,
           });
           return ok(cards);
         } catch (e) {
-          const code = e instanceof Error ? e.message : 'UNKNOWN';
-          return err(code as never, `Generation failed: ${code}`);
+          const message = e instanceof Error ? e.message : 'UNKNOWN';
+          // Map to RATE_LIMITED if error implies quota or rate limiting
+          if (message.toLowerCase().includes('rate limit') || message.includes('429')) {
+            return err('RATE_LIMITED', `Generation failed due to rate limits: ${message}`);
+          }
+          return err('UNKNOWN', `Generation failed: ${message}`);
         }
       }
 
