@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SourceSchema, DeckSchema, CardSchema, ReviewSchema } from '@/data/schemas';
+import { SourceSchema, CardSchema, ReviewSchema } from '@/data/schemas';
 import { GenerationOutputSchema } from '@/data/schemas/generation';
 
 describe('SourceSchema', () => {

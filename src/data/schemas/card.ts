@@ -48,4 +48,6 @@ export const NewCardSchema = CardSchema.omit({
   createdAt: true,
   updatedAt: true,
 });
-export type NewCard = z.infer<typeof NewCardSchema>;
+// Input type: fields with Zod defaults (tags, suspended) are optional for callers.
+// Defaults are applied by NewCardSchema.parse() in the repo.
+export type NewCard = z.input<typeof NewCardSchema>;

@@ -16,12 +16,12 @@ export default defineContentScript({
       const selection = window.getSelection();
       const text = selection?.toString().trim();
 
-      if (!text || text.length < 20) {
+      if (!selection || !text || text.length < 20 || selection.rangeCount === 0) {
         removeToolbar();
         return;
       }
 
-      const range = selection!.getRangeAt(0);
+      const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       showToolbar(text, rect);
     }
@@ -73,8 +73,7 @@ export default defineContentScript({
         <button class="mneme-close" aria-label="Dismiss">✕</button>
       `;
 
-      const top = rect.bottom + window.scrollY + 8;
-      const left = rect.left + window.scrollX + rect.width / 2;
+      // Toolbar is position: fixed, so use viewport-relative coordinates.
       pill.style.top = `${rect.bottom + 8}px`;
       pill.style.left = `${rect.left + rect.width / 2}px`;
       pill.style.transform = 'translateX(-50%)';

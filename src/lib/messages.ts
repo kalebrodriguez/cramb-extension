@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { NewCard } from '@/data/schemas';
 
 export const GenOptionsSchema = z.object({
   maxCards: z.number().int().min(1).max(20).default(8),
