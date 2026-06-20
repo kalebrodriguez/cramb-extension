@@ -58,6 +58,10 @@ export function Popup() {
                   payload: {
                     url: activeTab.url,
                   },
+                }, (response) => {
+                   if (response && response.error) {
+                     alert(`Failed to capture: ${response.error}`);
+                   }
                 });
                 openSidePanel();
               }
