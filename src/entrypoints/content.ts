@@ -12,6 +12,46 @@ export default defineContentScript({
       if (e.key === 'Escape') removeToolbar();
     });
 
+    // Listen for messages from background/popup
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.type === 'extractPage') {
+        try {
+          // Dynamic import so it only loads when needed
+          import('@mozilla/readability').then(({ Readability }) => {
+            import('dompurify').then((DOMPurify) => {
+              // Clone document to avoid modifying the active DOM
+              const docClone = document.cloneNode(true) as Document;
+              const reader = new Readability(docClone);
+              const article = reader.parse();
+              
+              if (!article) {
+                sendResponse({ error: 'Failed to extract article' });
+                return;
+              }
+
+              // Purify the HTML content
+              const cleanHtml = DOMPurify.default.sanitize(article.content ?? '');
+              const cleanText = article.textContent?.trim() ?? '';
+
+              sendResponse({
+                title: article.title,
+                byline: article.byline,
+                dir: article.dir,
+                content: cleanHtml,
+                textContent: cleanText,
+                length: article.length,
+                siteName: article.siteName,
+              });
+            });
+          });
+          return true; // Keep message channel open for async response
+        } catch (e) {
+          console.error('Extraction failed:', e);
+          sendResponse({ error: String(e) });
+        }
+      }
+    });
+
     function handleSelection() {
       const selection = window.getSelection();
       const text = selection?.toString().trim();

@@ -49,7 +49,20 @@ export function Popup() {
 
       <div className="flex flex-col gap-2">
         <button
-          onClick={openSidePanel}
+          onClick={() => {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              const activeTab = tabs[0];
+              if (activeTab?.id && activeTab.url) {
+                chrome.runtime.sendMessage({
+                  type: 'capture.fromPage',
+                  payload: {
+                    url: activeTab.url,
+                  },
+                });
+                openSidePanel();
+              }
+            });
+          }}
           className="w-full py-2 px-4 bg-surface border border-border rounded-md text-sm text-text hover:bg-elevated transition-colors duration-fast"
         >
           ＋ Capture this page
