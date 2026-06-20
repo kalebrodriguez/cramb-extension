@@ -131,6 +131,50 @@ export default defineBackground(() => {
         return ok(deck);
       }
 
+      case 'review.next': {
+        const { cardRepo } = await import('@/data/repositories');
+        try {
+          const cards = await cardRepo.getDue(msg.payload.deckId, 50);
+          return ok({ cards });
+        } catch (e) {
+          return err('UNKNOWN', `Failed to fetch due cards: ${String(e)}`);
+        }
+      }
+
+      case 'review.grade': {
+        const { cardRepo, reviewRepo } = await import('@/data/repositories');
+        const { scheduleCard } = await import('@/lib/scheduler');
+        try {
+          const card = await cardRepo.getById(msg.payload.cardId);
+          if (!card) return err('UNKNOWN', 'Card not found');
+
+          // Ensure rating is strongly typed to ts-fsrs Rating
+          const rating = msg.payload.rating as 1 | 2 | 3 | 4;
+          
+          // Calculate next state
+          const nextState = scheduleCard(card, rating);
+          
+          // Apply changes to card
+          await cardRepo.update(card.id, nextState);
+          
+          // Log review
+          await reviewRepo.create({
+            id: crypto.randomUUID(),
+            cardId: card.id,
+            rating,
+            durationMs: msg.payload.durationMs,
+            prevState: card.state,
+            ts: Date.now(),
+            scheduledDays: Math.floor(((nextState.due || Date.now()) - Date.now()) / 86400000),
+            elapsedDays: card.lastReview ? Math.floor((Date.now() - card.lastReview) / 86400000) : 0,
+          });
+
+          return ok({ success: true });
+        } catch (e) {
+          return err('UNKNOWN', `Grading failed: ${String(e)}`);
+        }
+      }
+
       case 'cards.save': {
         const { cardRepo } = await import('@/data/repositories');
         
