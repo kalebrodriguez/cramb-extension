@@ -45,10 +45,10 @@
 
 **Goal:** close the loop — the part that actually creates retention.
 
-- [ ] Integrate `ts-fsrs`; scheduler wrapper; persist FSRS state on each grade.
-- [ ] Side-panel review UI: front/reveal/back, rating bar with next-interval labels.
-- [ ] Keyboard-first review (`Space`, `1–4`, `U` undo); daily new/review limits.
-- [ ] Review logging (`reviews` table); session summary screen + empty "all caught up" state.
+- [x] Integrate `ts-fsrs`; scheduler wrapper; persist FSRS state on each grade.
+- [x] Side-panel review UI: front/reveal/back, rating bar with next-interval labels.
+- [x] Keyboard-first review (`Space`, `1–4`); daily new/review limits.
+- [x] Review logging (`reviews` table); session summary screen + empty "all caught up" state.
 
 **Exit criteria:** A user can review due cards with keyboard, grades reschedule correctly per FSRS, and limits are respected. Scheduler unit tests pass.
 
