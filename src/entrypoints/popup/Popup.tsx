@@ -49,7 +49,8 @@ export function Popup() {
 
       <div className="flex flex-col gap-2">
         <button
-          onClick={() => {
+          onClick={async () => {
+            await openSidePanel(); // Open side panel first!
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
               const activeTab = tabs[0];
               if (activeTab?.id && activeTab.url) {
@@ -60,10 +61,11 @@ export function Popup() {
                   },
                 }, (response) => {
                    if (response && response.error) {
-                     alert(`Failed to capture: ${response.error}`);
+                     // The error might be a structured object from our Result type
+                     const errMsg = typeof response.error === 'object' ? JSON.stringify(response.error) : response.error;
+                     alert(`Failed to capture: ${errMsg}`);
                    }
                 });
-                openSidePanel();
               }
             });
           }}
