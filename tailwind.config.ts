@@ -1,0 +1,86 @@
+import type { Config } from 'tailwindcss';
+
+export default {
+  content: ['./src/**/*.{ts,tsx,html}'],
+  darkMode: ['class', '[data-theme="dark"]'],
+  theme: {
+    extend: {
+      colors: {
+        bg: 'var(--bg)',
+        surface: 'var(--bg-surface)',
+        elevated: 'var(--bg-elevated)',
+        input: 'var(--bg-input)',
+        border: 'var(--border)',
+        'border-subtle': 'var(--border-subtle)',
+        text: 'var(--text)',
+        muted: 'var(--text-muted)',
+        faint: 'var(--text-faint)',
+        brand: 'var(--brand)',
+        'brand-strong': 'var(--brand-strong)',
+        'on-brand': 'var(--on-brand)',
+        accent: 'var(--accent)',
+        rating: {
+          again: 'var(--rating-again)',
+          hard: 'var(--rating-hard)',
+          good: 'var(--rating-good)',
+          easy: 'var(--rating-easy)',
+        },
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        danger: 'var(--danger)',
+        info: 'var(--info)',
+      },
+      borderRadius: {
+        sm: '6px',
+        md: '10px',
+        lg: '14px',
+        xl: '20px',
+      },
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ["'Source Serif 4'", 'Georgia', "'Times New Roman'", 'serif'],
+        mono: ["'JetBrains Mono'", 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      fontSize: {
+        xs: ['12px', { lineHeight: '16px' }],
+        sm: ['13px', { lineHeight: '18px' }],
+        base: ['14px', { lineHeight: '20px' }],
+        md: ['16px', { lineHeight: '24px' }],
+        lg: ['18px', { lineHeight: '26px' }],
+        xl: ['22px', { lineHeight: '30px' }],
+        '2xl': ['28px', { lineHeight: '36px' }],
+      },
+      spacing: {
+        1: '4px',
+        2: '8px',
+        3: '12px',
+        4: '16px',
+        5: '20px',
+        6: '24px',
+        8: '32px',
+        10: '40px',
+        12: '48px',
+      },
+      boxShadow: {
+        sm: '0 1px 2px rgba(0,0,0,0.30)',
+        md: '0 4px 12px rgba(0,0,0,0.35)',
+        lg: '0 12px 32px rgba(0,0,0,0.45)',
+      },
+      transitionTimingFunction: {
+        out: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
+      transitionDuration: {
+        fast: '120ms',
+        base: '200ms',
+        slow: '320ms',
+      },
+      zIndex: {
+        toolbar: '2147483000',
+        toast: '60',
+        modal: '50',
+        popover: '40',
+      },
+    },
+  },
+  plugins: [],
+} satisfies Config;
