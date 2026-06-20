@@ -220,11 +220,16 @@ export function SidePanel() {
     deckRepo.listAll().then(setDecks);
   }, []);
 
-  // Listen for capture events
+  // Listen for capture events and check storage on mount
   useEffect(() => {
-    // When the background finishes a capture and generates a source, 
-    // it will be saved to Dexie. We could poll or use a message here.
-    // Let's rely on standard chrome message passing.
+    // Check if there was an active capture we missed due to race condition
+    chrome.storage.local.get(['activeCaptureSourceId']).then((res) => {
+      if (res.activeCaptureSourceId) {
+         setSourceId(res.activeCaptureSourceId);
+         setView('capture');
+      }
+    });
+
     const listener = (msg: unknown) => {
        const typedMsg = msg as { type?: string; sourceId?: string };
        if (typedMsg.type === 'CAPTURE_COMPLETE' && typedMsg.sourceId) {
@@ -310,6 +315,7 @@ export function SidePanel() {
       });
 
       // Clear state and go home
+      await chrome.storage.local.remove('activeCaptureSourceId');
       clear();
       setView('home');
       
