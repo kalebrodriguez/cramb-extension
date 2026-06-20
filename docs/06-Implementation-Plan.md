@@ -30,12 +30,12 @@
 
 **Goal:** the core loop works end-to-end for articles. This is the "would I use it?" moment.
 
-- [ ] Content script: Readability extraction + DOMPurify; selection capture.
-- [ ] In-page capture toolbar (shadow-DOM) on selection + popup "Capture this page."
-- [ ] Generation orchestrator: chunking, card cap, schema validation, one repair retry.
-- [ ] Side panel: generated-card list with edit/delete/accept + deck picker.
-- [ ] Persist sources + cards via repositories; auto-deck per source.
-- [ ] Error states: `NO_MODEL_CONFIG`, `INVALID_KEY`, `RATE_LIMITED`, `EXTRACTION_EMPTY`.
+- [x] Content script: Readability extraction + DOMPurify; selection capture.
+- [x] In-page capture toolbar (shadow-DOM) on selection + popup "Capture this page."
+- [x] Generation orchestrator: chunking, card cap, schema validation, one repair retry.
+- [x] Side panel: generated-card list with edit/delete/accept + deck picker.
+- [x] Persist sources + cards via repositories; auto-deck per source.
+- [x] Error states: `NO_MODEL_CONFIG`, `INVALID_KEY`, `RATE_LIMITED`, `EXTRACTION_EMPTY`.
 
 **Exit criteria:** From a real article, a user can capture, see editable cards, and save them to a deck — with all four error states handled gracefully.
 
