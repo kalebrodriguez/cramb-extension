@@ -75,6 +75,7 @@ export default defineBackground(() => {
           }
           
           // Let the side panel know that capture is complete
+          await chrome.storage.local.set({ activeCaptureSourceId: source.id });
           chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
 
           return ok(source);
@@ -111,6 +112,7 @@ export default defineBackground(() => {
         }
         
         // Let the side panel know that capture is complete
+        await chrome.storage.local.set({ activeCaptureSourceId: source.id });
         chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
 
         return ok(source);
