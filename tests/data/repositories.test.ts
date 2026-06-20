@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { db } from '@/data/db';
-import { sourceRepo, deckRepo, cardRepo, reviewRepo } from '@/data/repositories';
+import { sourceRepo, deckRepo, cardRepo } from '@/data/repositories';
 
 beforeEach(async () => {
   await db.delete();
@@ -63,7 +63,7 @@ describe('cardRepo', () => {
 
     const due = await cardRepo.getDue();
     expect(due.length).toBeGreaterThanOrEqual(1);
-    expect(due[0]!.front).toBe('What is 1+1?');
+    expect(due[0]?.front).toBe('What is 1+1?');
   });
 
   it('bulk creates cards', async () => {

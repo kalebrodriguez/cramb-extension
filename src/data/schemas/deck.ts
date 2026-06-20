@@ -19,4 +19,6 @@ export const NewDeckSchema = DeckSchema.omit({
   createdAt: true,
   updatedAt: true,
 });
-export type NewDeck = z.infer<typeof NewDeckSchema>;
+// Input type: fields with Zod defaults (color, newPerDay, reviewsPerDay) are
+// optional for callers. Defaults are applied by NewDeckSchema.parse() in the repo.
+export type NewDeck = z.input<typeof NewDeckSchema>;

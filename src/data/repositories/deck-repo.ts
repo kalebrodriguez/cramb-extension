@@ -1,12 +1,14 @@
 import Dexie from 'dexie';
 import { db } from '../db';
-import type { Deck, NewDeck } from '../schemas';
+import { NewDeckSchema, type Deck, type NewDeck } from '../schemas';
 
 export const deckRepo = {
   async create(data: NewDeck): Promise<Deck> {
     const now = Date.now();
+    // parse() applies Zod defaults for omitted fields (color, newPerDay, reviewsPerDay).
+    const withDefaults = NewDeckSchema.parse(data);
     const deck: Deck = {
-      ...data,
+      ...withDefaults,
       id: crypto.randomUUID(),
       createdAt: now,
       updatedAt: now,

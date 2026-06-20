@@ -8,8 +8,11 @@ export function Popup() {
     cardRepo.getDueCount().then(setDueCount);
   }, []);
 
-  function openSidePanel() {
-    chrome.sidePanel?.open?.({ windowId: undefined! });
+  async function openSidePanel() {
+    const win = await chrome.windows.getCurrent();
+    if (win.id !== undefined) {
+      await chrome.sidePanel.open({ windowId: win.id });
+    }
   }
 
   function openOptions() {

@@ -1,42 +1,36 @@
 import Dexie from 'dexie';
 import { db } from '../db';
-import type { Card, NewCard } from '../schemas';
+import { NewCardSchema, type Card, type NewCard } from '../schemas';
+
+function buildCard(data: NewCard, now: number): Card {
+  // parse() applies Zod defaults for omitted fields (tags, suspended).
+  const withDefaults = NewCardSchema.parse(data);
+  return {
+    ...withDefaults,
+    id: crypto.randomUUID(),
+    due: now,
+    stability: 0,
+    difficulty: 0,
+    reps: 0,
+    lapses: 0,
+    state: 0,
+    lastReview: undefined,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
 
 export const cardRepo = {
   async create(data: NewCard): Promise<Card> {
     const now = Date.now();
-    const card: Card = {
-      ...data,
-      id: crypto.randomUUID(),
-      due: now,
-      stability: 0,
-      difficulty: 0,
-      reps: 0,
-      lapses: 0,
-      state: 0,
-      lastReview: undefined,
-      createdAt: now,
-      updatedAt: now,
-    };
+    const card = buildCard(data, now);
     await db.cards.add(card);
     return card;
   },
 
   async createMany(cards: NewCard[]): Promise<Card[]> {
     const now = Date.now();
-    const fullCards: Card[] = cards.map((data) => ({
-      ...data,
-      id: crypto.randomUUID(),
-      due: now,
-      stability: 0,
-      difficulty: 0,
-      reps: 0,
-      lapses: 0,
-      state: 0 as const,
-      lastReview: undefined,
-      createdAt: now,
-      updatedAt: now,
-    }));
+    const fullCards = cards.map((data) => buildCard(data, now));
     await db.cards.bulkAdd(fullCards);
     return fullCards;
   },
