@@ -35,7 +35,9 @@ export default defineBackground(() => {
         
         try {
           // Ask the content script to extract the page
-          const extraction: unknown = await chrome.tabs.sendMessage(tabId, { type: 'extractPage' });
+          const extraction: unknown = await chrome.tabs.sendMessage(tabId, { type: 'extractPage' }).catch(err => {
+            return { error: String(err) };
+          });
           
           if (!extraction || typeof extraction !== 'object' || 'error' in extraction) {
             const errObj = extraction as { error?: string };
