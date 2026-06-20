@@ -35,13 +35,14 @@ export default defineBackground(() => {
         
         try {
           // Ask the content script to extract the page
-          const extraction: any = await chrome.tabs.sendMessage(tabId, { type: 'extractPage' });
+          const extraction: unknown = await chrome.tabs.sendMessage(tabId, { type: 'extractPage' });
           
-          if (!extraction || extraction.error) {
-            return err('EXTRACTION_EMPTY', extraction?.error || 'Failed to extract content from page.');
+          if (!extraction || typeof extraction !== 'object' || 'error' in extraction) {
+            const errObj = extraction as { error?: string };
+            return err('EXTRACTION_EMPTY', errObj?.error || 'Failed to extract content from page.');
           }
 
-          const { title, byline, content, textContent } = extraction;
+          const { title, byline, textContent } = extraction as { title?: string, byline?: string, textContent?: string };
 
           if (!textContent || textContent.trim().length === 0) {
             return err('EXTRACTION_EMPTY', 'No text content could be extracted from this page.');
@@ -103,7 +104,7 @@ export default defineBackground(() => {
 
         // Ensure a deck exists for this source
         const existingDecks = await deckRepo.listAll();
-        let deckId = existingDecks.find(d => d.name === sourceName)?.id;
+        const deckId = existingDecks.find(d => d.name === sourceName)?.id;
         
         if (!deckId) {
             await deckRepo.create({ name: sourceName, sourceId: source.id });
@@ -134,17 +135,28 @@ export default defineBackground(() => {
         const { cardRepo } = await import('@/data/repositories');
         
         try {
-          const cardsToCreate = msg.payload.cards.map((c: any) => ({
-             deckId: msg.payload.deckId,
-             type: c.type || 'basic',
-             front: c.front,
-             back: c.back,
-             clozeText: c.clozeText,
-             choices: c.choices,
-             answerIndex: c.answerIndex,
-             tags: c.tags || [],
-             suspended: false
-          }));
+          const cardsToCreate = msg.payload.cards.map((c: unknown) => {
+             const card = c as {
+                type?: string;
+                front: string;
+                back: string;
+                clozeText?: string;
+                choices?: string[];
+                answerIndex?: number;
+                tags?: string[];
+             };
+             return {
+               deckId: msg.payload.deckId,
+               type: (card.type || 'basic') as "basic" | "cloze" | "mcq",
+               front: card.front,
+               back: card.back,
+               clozeText: card.clozeText,
+               choices: card.choices,
+               answerIndex: card.answerIndex,
+               tags: card.tags || [],
+               suspended: false
+             };
+          });
 
           for (const card of cardsToCreate) {
              await cardRepo.create(card);

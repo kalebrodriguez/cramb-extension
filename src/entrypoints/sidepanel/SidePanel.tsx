@@ -65,9 +65,10 @@ export function SidePanel() {
     // When the background finishes a capture and generates a source, 
     // it will be saved to Dexie. We could poll or use a message here.
     // Let's rely on standard chrome message passing.
-    const listener = (msg: any) => {
-       if (msg.type === 'CAPTURE_COMPLETE') {
-           setSourceId(msg.sourceId);
+    const listener = (msg: unknown) => {
+       const typedMsg = msg as { type?: string; sourceId?: string };
+       if (typedMsg.type === 'CAPTURE_COMPLETE' && typedMsg.sourceId) {
+           setSourceId(typedMsg.sourceId);
            setView('capture');
        }
     };
@@ -76,13 +77,18 @@ export function SidePanel() {
   }, [setSourceId]);
 
   useEffect(() => {
+    let active = true;
     if (sourceId) {
       sourceRepo.getById(sourceId).then((src) => {
-        if (src) setActiveSource(src);
+        if (active && src) setActiveSource(src);
       });
     } else {
-      setActiveSource(null);
+      // Defer the set state to a microtask so it's not synchronous
+      queueMicrotask(() => {
+        if (active) setActiveSource(null);
+      });
     }
+    return () => { active = false; };
   }, [sourceId]);
 
   const handleGenerateCards = async () => {
