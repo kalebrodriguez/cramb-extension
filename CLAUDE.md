@@ -88,14 +88,15 @@ docs/           the 6 product/eng docs
 ---
 
 ## 7. Current status (UPDATE EACH SESSION)
-- **Phase:** M0 complete — project scaffolded, building, tests passing.
-- **What's done:** WXT + React + Tailwind v4 scaffold; Dexie DB + repository layer; Zod schemas for all entities + messages + LLM output; all 4 provider adapters (OpenAI, Anthropic, Google, Ollama); background SW message hub; popup, options (provider/key form + test connection), side panel; content script with shadow-DOM capture toolbar; CI workflow; 15 unit tests (schemas + repositories); repo hygiene (LICENSE, README, CONTRIBUTING, CODE_OF_CONDUCT, .editorconfig).
-- **Next action:** Milestone 0 remaining — validate the niche (`docs/research.md`), confirm/lock name + availability. Then Milestone 1 — wire end-to-end capture → generate → save flow.
+- **Phase:** M1 complete — capture → generate → save core loop works.
+- **What's done:** WXT + React + Tailwind v4 scaffold; Dexie DB + repository layer; Zod schemas for all entities + messages + LLM output; all 4 provider adapters; background SW message hub; popup, options, side panel. Added DOM extraction via `@mozilla/readability` and `DOMPurify` to content script. Wired up the end-to-end "capture this page" and "capture selection" flow. Implemented background generation orchestrator logic to chunk large texts. Built sidepanel UI that displays extracted cards, allows the user to edit/delete/save them, and surfaces key error states (`NO_MODEL_CONFIG`, `RATE_LIMITED`).
+- **Next action:** Milestone 2 — Review Engine. Integrate `ts-fsrs` and create the Side-panel review UI.
 - **Last updated:** 2026-06-20.
 
 ### Changelog of context
 - 2026-06-20 — Initial product + engineering docs written; stack and architecture chosen.
 - 2026-06-20 — M0 scaffold complete. WXT 0.20.26, React 19, Tailwind v4, Dexie 4, Zod 4, ts-fsrs 5.4, TypeScript 6. Build succeeds for Chromium. 15 tests pass.
+- 2026-06-20 — Validated niche, renamed project to "Cramb". M1 feature loop implemented (extraction -> chunked generation -> editable card queue -> local save).
 
 ---
 
