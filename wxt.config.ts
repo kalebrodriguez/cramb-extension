@@ -4,7 +4,7 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    name: 'Mneme — Remember What You Read',
+    name: 'Cramb — Remember What You Read',
     description:
       'Turn articles and videos into spaced-repetition flashcards. Privacy-first, local-first, Anki-compatible.',
     permissions: ['activeTab', 'scripting', 'storage', 'sidePanel'],

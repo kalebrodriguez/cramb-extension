@@ -29,12 +29,12 @@ export default defineContentScript({
     function showToolbar(text: string, rect: DOMRect) {
       removeToolbar();
 
-      const host = document.createElement('mneme-toolbar');
+      const host = document.createElement('cramb-toolbar');
       const shadow = host.attachShadow({ mode: 'closed' });
 
       const style = document.createElement('style');
       style.textContent = `
-        .mneme-pill {
+        .cramb-pill {
           position: fixed;
           z-index: 2147483000;
           display: flex;
@@ -51,9 +51,9 @@ export default defineContentScript({
           user-select: none;
           transition: background 120ms ease-out;
         }
-        .mneme-pill:hover { background: #334155; }
-        .mneme-pill .icon { color: #8C7DF7; }
-        .mneme-close {
+        .cramb-pill:hover { background: #334155; }
+        .cramb-pill .icon { color: #8C7DF7; }
+        .cramb-close {
           background: none;
           border: none;
           color: #94A3B8;
@@ -62,15 +62,15 @@ export default defineContentScript({
           font-size: 14px;
           line-height: 1;
         }
-        .mneme-close:hover { color: #F8FAFC; }
+        .cramb-close:hover { color: #F8FAFC; }
       `;
 
       const pill = document.createElement('div');
-      pill.className = 'mneme-pill';
+      pill.className = 'cramb-pill';
       pill.innerHTML = `
         <span class="icon">✦</span>
         <span>Make cards</span>
-        <button class="mneme-close" aria-label="Dismiss">✕</button>
+        <button class="cramb-close" aria-label="Dismiss">✕</button>
       `;
 
       // Toolbar is position: fixed, so use viewport-relative coordinates.
@@ -79,7 +79,7 @@ export default defineContentScript({
       pill.style.transform = 'translateX(-50%)';
 
       pill.addEventListener('click', (e) => {
-        if ((e.target as HTMLElement).closest('.mneme-close')) {
+        if ((e.target as HTMLElement).closest('.cramb-close')) {
           removeToolbar();
           return;
         }
