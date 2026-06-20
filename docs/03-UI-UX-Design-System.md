@@ -1,4 +1,4 @@
-# Mneme — UI/UX Design System
+# Cramb — UI/UX Design System
 
 > **Status:** Draft v0.1 · **Last updated:** 2026-06-20
 > Companion file: `docs/design/mockup.html` (interactive high-fidelity mockup of the key screens, built with these exact tokens).
@@ -10,7 +10,7 @@
 ## 1. Brand
 
 ### 1.1 Essence
-Mneme (pronounced *NEE-mee*) is named for the Greek muse of memory. The brand should feel like a **calm, focused study companion** — scholarly but modern, encouraging without being gamified or childish. It rewards consistency quietly; it never nags.
+Cramb (pronounced *NEE-mee*) is named for the Greek muse of memory. The brand should feel like a **calm, focused study companion** — scholarly but modern, encouraging without being gamified or childish. It rewards consistency quietly; it never nags.
 
 ### 1.2 Personality
 - **Calm, not loud.** Generous whitespace, soft motion, muted surfaces.
@@ -29,7 +29,7 @@ Mneme (pronounced *NEE-mee*) is named for the Greek muse of memory. The brand sh
 Microcopy rules: short, human, lowercase-friendly for secondary text, no exclamation spam, name the next action.
 
 ### 1.4 Logo
-Wordmark **"mneme"** in the brand sans, paired with a mark: a simple **knot/loop glyph** (a loop = the spaced-repetition loop and the "tying a string around your finger" memory metaphor). Mark works as a monochrome 16px favicon and a 128px store icon. Minimum clear space = height of the "m". Provide light-on-dark and dark-on-light lockups.
+Wordmark **"cramb"** in the brand sans, paired with a mark: a simple **knot/loop glyph** (a loop = the spaced-repetition loop and the "tying a string around your finger" memory metaphor). Mark works as a monochrome 16px favicon and a 128px store icon. Minimum clear space = height of the "m". Provide light-on-dark and dark-on-light lockups.
 
 ---
 
@@ -238,7 +238,7 @@ Each component lists: purpose, variants, states, and a11y notes. These map 1:1 t
 ### 4.1 Popup (launcher)
 ```
 ┌──────────────────────────────┐
-│ ✦ mneme            ⚙        │
+│ ✦ cramb            ⚙        │
 ├──────────────────────────────┤
 │        ◯ 12 due today        │
 │     [   Review now   ]       │

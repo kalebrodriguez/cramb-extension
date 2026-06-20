@@ -1,8 +1,8 @@
-# ✦ Mneme
+# ✦ Cramb
 
 **Remember what you read.**
 
-Mneme is a privacy-first, open-source browser extension that turns what you read or watch online into spaced-repetition flashcards — so the things you learn actually stick.
+Cramb is a privacy-first, open-source browser extension that turns what you read or watch online into spaced-repetition flashcards — so the things you learn actually stick.
 
 ## How it works
 
@@ -22,7 +22,7 @@ pnpm dev:firefox  # run in Firefox
 
 ### Set up a model
 
-Mneme needs access to an LLM to generate cards. You bring your own:
+Cramb needs access to an LLM to generate cards. You bring your own:
 
 - **OpenAI** / **Anthropic** / **Google** — paste your API key in Settings
 - **Ollama** — run a local model at `localhost:11434` (free, fully private)

@@ -1,7 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { Source, Deck, Card, Review } from './schemas';
 
-export class MnemeDB extends Dexie {
+export class CrambDB extends Dexie {
   sources!: EntityTable<Source, 'id'>;
   decks!: EntityTable<Deck, 'id'>;
   cards!: EntityTable<Card, 'id'>;
@@ -9,7 +9,7 @@ export class MnemeDB extends Dexie {
   meta!: EntityTable<{ key: string; value: string }, 'key'>;
 
   constructor() {
-    super('mneme');
+    super('cramb');
 
     this.version(1).stores({
       sources: 'id, contentHash, capturedAt, type',
@@ -21,4 +21,4 @@ export class MnemeDB extends Dexie {
   }
 }
 
-export const db = new MnemeDB();
+export const db = new CrambDB();

@@ -1,6 +1,6 @@
-# Contributing to Mneme
+# Contributing to Cramb
 
-Thanks for your interest in contributing! Mneme is designed to be easy to contribute to.
+Thanks for your interest in contributing! Cramb is designed to be easy to contribute to.
 
 ## Getting started
 
@@ -12,7 +12,7 @@ Thanks for your interest in contributing! Mneme is designed to be easy to contri
 
 ## What to work on
 
-Check the [Issues](https://github.com/kalebrodriguez/mneme/issues) tab for `good first issue` labels. The easiest contributions are:
+Check the [Issues](https://github.com/kalebrodriguez/cramb/issues) tab for `good first issue` labels. The easiest contributions are:
 
 - **New model provider** — add a file in `src/background/providers/` implementing `LLMProvider`
 - **New content source adapter** — add extraction logic in `src/content/`

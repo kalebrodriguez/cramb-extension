@@ -1,6 +1,6 @@
-# CLAUDE.md — AI Development Context for Mneme
+# CLAUDE.md — AI Development Context for Cramb
 
-> Read this first, every session. It tells you (the AI assistant) how to think while building Mneme.
+> Read this first, every session. It tells you (the AI assistant) how to think while building Cramb.
 > Keep it **current**: when architecture, status, or rules change, update this file in the same PR.
 
 **Answers the question:** *How should the AI think while building this?*
@@ -8,7 +8,7 @@
 ---
 
 ## 1. What we're building (one paragraph)
-**Mneme** is a privacy-first, open-source **browser extension** that turns what the user reads or watches online into **spaced-repetition flashcards and quizzes**, so they actually remember it. The user highlights text or one-clicks an article/video; an LLM (the user's **own** key, or local **Ollama**) generates editable cards; the user reviews them on an **FSRS** schedule. Everything is **local-first** (IndexedDB) and **Anki-compatible** (export). No backend, no accounts in v1.
+**Cramb** is a privacy-first, open-source **browser extension** that turns what the user reads or watches online into **spaced-repetition flashcards and quizzes**, so they actually remember it. The user highlights text or one-clicks an article/video; an LLM (the user's **own** key, or local **Ollama**) generates editable cards; the user reviews them on an **FSRS** schedule. Everything is **local-first** (IndexedDB) and **Anki-compatible** (export). No backend, no accounts in v1.
 
 **Tagline:** *Remember what you read.*
 **Full specs live in `docs/`** — PRD, App-Flow, UI/UX Design System, Backend Schema, TRD, Implementation Plan. When in doubt, those documents win; if you change behavior, update them.
@@ -108,7 +108,7 @@ docs/           the 6 product/eng docs
 ---
 
 ## 9. Naming
-Working name is **Mneme** (Greek muse of memory; *NEE-mee*). It is **not yet trademark/availability-checked** — verify npm + store + domain in M0. To rename, find-replace `Mneme`/`mneme` across `docs/`, `README`, manifest, and this file. Alternatives considered: *Encore*, *Synap*.
+Working name is **Cramb** (Greek muse of memory; *NEE-mee*). It is **not yet trademark/availability-checked** — verify npm + store + domain in M0. To rename, find-replace `Cramb`/`cramb` across `docs/`, `README`, manifest, and this file. Alternatives considered: *Encore*, *Synap*.
 
 ---
 
