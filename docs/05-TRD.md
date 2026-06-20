@@ -1,4 +1,4 @@
-# Mneme — Technical Requirements Document (TRD)
+# Cramb — Technical Requirements Document (TRD)
 
 > **Status:** Draft v0.1 · **Last updated:** 2026-06-20
 > Pin exact dependency versions at project init (`pnpm create`), then record them here and in `CLAUDE.md`.
@@ -34,7 +34,7 @@
 ## 2. Architecture
 
 ### 2.1 Overview
-Mneme is a **client-only, event-driven extension**. The background service worker is the brain (holds secrets, talks to providers, owns the DB-write path and scheduling); UI surfaces are thin clients that message the SW; the content script is a per-page agent for extraction and the capture toolbar.
+Cramb is a **client-only, event-driven extension**. The background service worker is the brain (holds secrets, talks to providers, owns the DB-write path and scheduling); UI surfaces are thin clients that message the SW; the content script is a per-page agent for extraction and the capture toolbar.
 
 ```mermaid
 flowchart TB
@@ -83,7 +83,7 @@ flowchart TB
 
 ### 2.3 Folder structure (target)
 ```
-mneme/
+cramb/
 ├─ src/
 │  ├─ background/        # service worker: message hub, orchestrators
 │  │  ├─ index.ts
@@ -128,7 +128,7 @@ There is no inbound server; nothing listens for external requests. (A sync ingre
 
 ## 4. Security requirements
 
-Security is a first-class requirement because Mneme handles a user secret (API key) and the content of everything they capture.
+Security is a first-class requirement because Cramb handles a user secret (API key) and the content of everything they capture.
 
 ### 4.1 Secret handling
 - API key stored in `chrome.storage.local` under a dedicated key; **never** in IndexedDB, **never** in exports, **never** logged, **never** sent to content scripts/pages.

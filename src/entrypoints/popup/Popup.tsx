@@ -22,7 +22,7 @@ export function Popup() {
   return (
     <div className="flex flex-col gap-4 p-4 bg-bg text-text">
       <header className="flex items-center justify-between">
-        <h1 className="text-md font-semibold text-brand">✦ mneme</h1>
+        <h1 className="text-md font-semibold text-brand">✦ cramb</h1>
         <button
           onClick={openOptions}
           className="text-muted hover:text-text transition-colors duration-fast"

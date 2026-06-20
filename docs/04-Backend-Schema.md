@@ -1,10 +1,10 @@
-# Mneme — Database & Backend Schema
+# Cramb — Database & Backend Schema
 
 > **Status:** Draft v0.1 · **Last updated:** 2026-06-20
 
 **Answers the question:** *How is data organized?*
 
-> **Important framing:** Mneme v1 has **no server**. The "backend" is the extension's
+> **Important framing:** Cramb v1 has **no server**. The "backend" is the extension's
 > background service worker plus on-device storage. So this document covers: (1) the local
 > data model, (2) the storage strategy, (3) the internal message "API" between extension
 > surfaces, (4) the external LLM provider contract, (5) the export contract, and (6) a
@@ -200,7 +200,7 @@ Append-only log; powers FSRS optimization and stats.
 interface Settings {
   provider: 'openai' | 'anthropic' | 'google' | 'ollama';
   model: string;                 // e.g. provider-specific model id
-  // apiKey stored under a SEPARATE key ('mneme.secret.apiKey') — see §1
+  // apiKey stored under a SEPARATE key ('cramb.secret.apiKey') — see §1
   ollamaEndpoint: string;        // default 'http://localhost:11434'
   generation: {
     maxCardsPerCapture: number;  // default 8
@@ -215,8 +215,8 @@ interface Settings {
 
 The secret is its own key so it can be written/cleared independently and excluded from any settings export:
 ```
-mneme.settings   -> Settings (above)
-mneme.secret.apiKey -> string   // never exported, never logged, background-only read
+cramb.settings   -> Settings (above)
+cramb.secret.apiKey -> string   // never exported, never logged, background-only read
 ```
 
 ---
@@ -298,7 +298,7 @@ Adapters normalize provider-specific request/response shapes and surface a unifo
   - `basic` → Anki Basic note (Front/Back).
   - `cloze` → Anki Cloze note (using `{{c1::…}}` from `clozeText`).
   - `mcq` → Basic note with choices rendered into Front, answer on Back (Anki has no native MCQ).
-  - One Mneme deck → one Anki deck (name preserved). Tags carried over.
+  - One Cramb deck → one Anki deck (name preserved). Tags carried over.
 - **AnkiConnect (optional, later):** POST to `http://localhost:8765` `addNotes` when the user has AnkiConnect running. Detected, never required.
 - **JSON export/import:** full portable backup `{ sources, decks, cards, reviews, schemaVersion }` (excludes settings + secret).
 

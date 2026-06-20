@@ -1,4 +1,4 @@
-# Mneme — App Flow / User Flow
+# Cramb — App Flow / User Flow
 
 > **Status:** Draft v0.1 · **Last updated:** 2026-06-20
 > Mermaid diagrams render natively on GitHub.
@@ -9,7 +9,7 @@
 
 ## 1. Surfaces (where the UI lives)
 
-A browser extension is not a single screen — it's a set of surfaces. Mneme uses five:
+A browser extension is not a single screen — it's a set of surfaces. Cramb uses five:
 
 | Surface | Tech | Purpose |
 |---------|------|---------|
@@ -54,7 +54,7 @@ Triggered automatically on install (opens a full-tab onboarding page). Goal: **t
 
 ```mermaid
 flowchart TD
-    A[Welcome screen: what Mneme does] --> B{Choose how to power it}
+    A[Welcome screen: what Cramb does] --> B{Choose how to power it}
     B -->|Bring API key| C[Pick provider: OpenAI / Anthropic / Google]
     B -->|Run locally| D[Ollama setup: detect localhost:11434]
     C --> E[Paste API key]
@@ -70,7 +70,7 @@ flowchart TD
 ```
 
 **Design notes**
-- The provider choice screen states plainly: *"Your key and your reading stay on your device. Mneme talks directly to the provider you choose and nowhere else."*
+- The provider choice screen states plainly: *"Your key and your reading stay on your device. Cramb talks directly to the provider you choose and nowhere else."*
 - Key validation does a minimal, cheap completion to confirm the key + model work, surfacing errors immediately (bad key, no quota, wrong region).
 - Onboarding is **skippable** but capture is gated on a working model config — if a user skips, the first capture re-prompts for setup (see §7 Edge cases).
 - We show the keyboard shortcut and how to pin the extension at the end.
@@ -79,7 +79,7 @@ flowchart TD
 
 ## 4. "Authentication" flow (BYO-key model)
 
-Mneme has **no accounts** in v1. "Auth" means *configuring access to a model provider.* This section documents it as the auth flow the PRD references.
+Cramb has **no accounts** in v1. "Auth" means *configuring access to a model provider.* This section documents it as the auth flow the PRD references.
 
 ```mermaid
 flowchart LR
