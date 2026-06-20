@@ -175,7 +175,7 @@ export function Options() {
         )}
 
         <p className="text-xs text-faint mt-4">
-          Your key and reading stay on this device. Mneme talks directly to
+          Your key and reading stay on this device. Cramb talks directly to
           the provider you choose and nowhere else.
         </p>
       </section>

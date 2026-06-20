@@ -1,7 +1,7 @@
-# Mneme — Product Requirements Document (PRD)
+# Cramb — Product Requirements Document (PRD)
 
 > **Status:** Draft v0.1 · **Owner:** Kaleb · **Last updated:** 2026-06-20
-> **Working name:** *Mneme* (Greek muse of memory). Easily renamed — see CLAUDE.md §Naming.
+> **Working name:** *Cramb* (Greek muse of memory). Easily renamed — see CLAUDE.md §Naming.
 
 **Answers the question:** *What are we building, and why?*
 
@@ -9,9 +9,9 @@
 
 ## 1. Summary
 
-**Mneme** is a privacy-first, open-source browser extension that turns whatever you read or watch online into spaced-repetition flashcards and quick quizzes — so the things you learn on the web actually stick.
+**Cramb** is a privacy-first, open-source browser extension that turns whatever you read or watch online into spaced-repetition flashcards and quick quizzes — so the things you learn on the web actually stick.
 
-You highlight a passage or one-click an article or YouTube video; Mneme uses an LLM (your own API key, or a local model) to generate high-quality recall cards; then it schedules them with a modern spaced-repetition algorithm so you review them at the right time. Everything is stored locally on your device by default, and you can export to Anki anytime.
+You highlight a passage or one-click an article or YouTube video; Cramb uses an LLM (your own API key, or a local model) to generate high-quality recall cards; then it schedules them with a modern spaced-repetition algorithm so you review them at the right time. Everything is stored locally on your device by default, and you can export to Anki anytime.
 
 **One-liner:** *Remember what you read.*
 
@@ -181,4 +181,4 @@ Because v1 is local-first with **no telemetry by default**, we measure success t
 - **Readwise/Pocket:** great capture & resurfacing of *highlights*, but passive — no generated recall practice.
 - **Anki/Mochi:** great review, but manual authoring.
 - **AI summarizers / "chat with page":** reduce reading time, not forgetting.
-- **Mneme:** capture → *auto-generate recall cards* → spaced review, local-first and Anki-compatible.
+- **Cramb:** capture → *auto-generate recall cards* → spaced review, local-first and Anki-compatible.

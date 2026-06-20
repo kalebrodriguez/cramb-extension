@@ -1,5 +1,5 @@
 {
-  "name": "mneme",
+  "name": "cramb",
   "version": "0.1.0",
   "description": "Remember what you read — a privacy-first browser extension that turns web content into spaced-repetition flashcards.",
   "private": true,
@@ -22,7 +22,7 @@
   "author": "Kaleb Rodriguez",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kalebrodriguez/mneme"
+    "url": "https://github.com/kalebrodriguez/cramb"
   },
   "dependencies": {
     "@wxt-dev/module-react": "^1.2.2",

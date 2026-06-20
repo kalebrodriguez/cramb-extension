@@ -1,4 +1,4 @@
-# Mneme — Implementation Plan
+# Cramb — Implementation Plan
 
 > **Status:** Draft v0.1 · **Last updated:** 2026-06-20
 
