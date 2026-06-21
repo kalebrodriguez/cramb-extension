@@ -12,13 +12,21 @@ Cramb is a privacy-first, open-source browser extension that turns what you read
 
 Everything stays on your device. Anki-compatible by design — export is coming in v0.4.
 
-## Quick start
+## Install
+
+Cramb isn't on the Chrome Web Store or Firefox AMO yet. For now, build it from
+source and load it as an unpacked extension.
+
+**Prerequisites:** [Node.js](https://nodejs.org) 20+ and [pnpm](https://pnpm.io) 9+.
 
 ```bash
-pnpm install
-pnpm dev          # run in Chromium with HMR
-pnpm dev:firefox  # run in Firefox
+pnpm install      # install dependencies
+pnpm build        # produces .output/chrome-mv3
 ```
+
+Then, in Chrome, go to `chrome://extensions`, enable **Developer mode**, click
+**Load unpacked**, and select the `.output/chrome-mv3` directory. (For Firefox,
+run `pnpm build:firefox` and load `.output/firefox-mv2` via `about:debugging`.)
 
 ### Set up a model
 
@@ -30,11 +38,16 @@ Cramb needs access to an LLM to generate cards. You bring your own:
 ## Development
 
 ```bash
+pnpm dev          # launches Chromium with the extension loaded, with HMR
+pnpm dev:firefox  # same, in Firefox
 pnpm test         # vitest unit tests
 pnpm lint         # eslint
 pnpm typecheck    # tsc --noEmit
 pnpm build        # production build (Chromium + Firefox)
 ```
+
+`pnpm dev` opens a fresh browser window with Cramb already loaded and hot-reloads
+on changes — no manual "load unpacked" step needed while developing.
 
 ## Tech stack
 
