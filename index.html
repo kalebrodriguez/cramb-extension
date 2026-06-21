@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cramb — Remember what you read</title>
+  <meta name="description" content="Cramb is a privacy-first, open-source browser extension that turns articles and videos into spaced-repetition flashcards — so the things you learn actually stick." />
+  <meta property="og:title" content="Cramb — Remember what you read" />
+  <meta property="og:description" content="Turn what you read and watch online into spaced-repetition flashcards. Privacy-first, local-first, bring your own AI key." />
+  <meta property="og:type" content="website" />
+  <style>
+    :root {
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --elevated: #243044;
+      --border: #334155;
+      --border-subtle: #1f2b3d;
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --faint: #64748B;
+      --brand: #8C7DF7;
+      --brand-strong: #7C6BF0;
+      --on-brand: #FFFFFF;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; animation: none !important; }
+    }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+    header.site {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; max-width: 880px; margin: 0 auto;
+    }
+    .logo { font-weight: 700; font-size: 1.15rem; color: var(--brand); }
+    .logo .mark { margin-right: 6px; }
+    nav a { color: var(--muted); margin-left: 20px; font-size: 0.92rem; }
+    nav a:hover { color: var(--text); text-decoration: none; }
+
+    .hero { text-align: center; padding: 72px 0 56px; }
+    .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
+    .hero .tagline { color: var(--brand); font-weight: 600; font-size: 1.1rem; margin: 0 0 18px; }
+    .hero p.lead { color: var(--muted); font-size: 1.15rem; max-width: 620px; margin: 0 auto 32px; }
+
+    .cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 9999px; font-weight: 600; font-size: 0.98rem;
+      border: 1px solid var(--border); transition: background 120ms ease, opacity 120ms ease;
+    }
+    .btn-primary { background: var(--brand-strong); color: var(--on-brand); border-color: var(--brand-strong); }
+    .btn-primary:hover { opacity: 0.9; text-decoration: none; }
+    .btn-ghost { background: var(--surface); color: var(--text); }
+    .btn-ghost:hover { background: var(--elevated); text-decoration: none; }
+    .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+    .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+    .soon { font-size: 0.72rem; color: var(--faint); display: block; margin-top: 8px; }
+
+    section { padding: 48px 0; border-top: 1px solid var(--border-subtle); }
+    section h2 { font-size: 1.5rem; margin: 0 0 28px; text-align: center; }
+
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card .n { color: var(--brand); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .card h3 { margin: 10px 0 8px; font-size: 1.1rem; }
+    .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .privacy { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+    .privacy ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .privacy li { margin: 8px 0; }
+    .privacy strong { color: var(--text); }
+
+    pre {
+      background: #0b1220; border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px; overflow-x: auto; font-size: 0.88rem; color: #cbd5e1;
+    }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    footer.site { text-align: center; color: var(--faint); font-size: 0.85rem; padding: 40px 24px 56px; border-top: 1px solid var(--border-subtle); }
+    footer.site a { color: var(--muted); margin: 0 8px; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <span class="logo"><span class="mark">✦</span>Cramb</span>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/kalebrodriguez/cramb-extension">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" style="border-top:none">
+      <p class="tagline">Remember what you read.</p>
+      <h1>Turn what you read into memory.</h1>
+      <p class="lead">
+        Cramb is a privacy-first, open-source browser extension that turns articles
+        and YouTube videos into spaced-repetition flashcards — so the things you
+        learn actually stick.
+      </p>
+      <div class="cta">
+        <span>
+          <a class="btn btn-primary" aria-disabled="true" href="#install">Add to Chrome</a>
+          <span class="soon">Coming to the Chrome Web Store</span>
+        </span>
+        <span>
+          <a class="btn btn-ghost" href="https://github.com/kalebrodriguez/cramb-extension">View on GitHub</a>
+        </span>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="card">
+          <span class="n">1 · Capture</span>
+          <h3>Highlight or one-click</h3>
+          <p>Select text, capture an article, or grab a YouTube video's transcript — in seconds, without leaving the page.</p>
+        </div>
+        <div class="card">
+          <span class="n">2 · Generate</span>
+          <h3>Editable cards</h3>
+          <p>An AI model — your own API key or a local Ollama model — drafts flashcards. You review and edit before anything is saved.</p>
+        </div>
+        <div class="card">
+          <span class="n">3 · Review</span>
+          <h3>Right on schedule</h3>
+          <p>Cards are scheduled with the FSRS algorithm so you review at the optimal moment — keyboard-first, right in your browser.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <h2>Private by design</h2>
+      <div class="privacy">
+        <ul>
+          <li><strong>Local-first.</strong> Your sources and cards live in your browser (IndexedDB) — there's no Cramb account and no backend.</li>
+          <li><strong>Bring your own key.</strong> Cramb never ships or shares an API key. It talks only to the model provider you choose.</li>
+          <li><strong>No tracking.</strong> No analytics, no telemetry, no phone-home. Your reading stays yours.</li>
+          <li><strong>Open source.</strong> Every line is on GitHub under the MIT license — audit it, fork it, contribute.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Install</h2>
+      <p style="color:var(--muted); text-align:center; max-width:620px; margin:0 auto 24px;">
+        Cramb isn't on the Chrome Web Store or Firefox Add-ons yet. Until then, you
+        can build it from source and load it as an unpacked extension:
+      </p>
+<pre><code>git clone https://github.com/kalebrodriguez/cramb-extension
+cd cramb-extension
+pnpm install
+pnpm build        # produces .output/chrome-mv3</code></pre>
+      <p style="color:var(--muted); text-align:center; max-width:620px; margin:24px auto 0;">
+        Then open <code>chrome://extensions</code>, enable <strong>Developer mode</strong>,
+        click <strong>Load unpacked</strong>, and select the <code>.output/chrome-mv3</code> folder.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div>
+      <a href="https://github.com/kalebrodriguez/cramb-extension">GitHub</a>
+      <a href="https://github.com/kalebrodriguez/cramb-extension/blob/main/LICENSE">MIT License</a>
+      <a href="https://github.com/kalebrodriguez/cramb-extension/issues">Report an issue</a>
+    </div>
+    <p style="margin-top:14px">✦ Cramb — remember what you read.</p>
+  </footer>
+</body>
+</html>
