@@ -14,6 +14,7 @@ export default defineConfig({
       'https://api.anthropic.com/*',
       'https://generativelanguage.googleapis.com/*',
       'http://localhost:11434/*',
+      'https://www.youtube.com/*',
     ],
   },
   webExt: {

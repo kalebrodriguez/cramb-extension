@@ -1,12 +1,45 @@
 import { useEffect, useState } from 'react';
 import { cardRepo } from '@/data/repositories';
 
+function isYouTubeWatchUrl(url: string | undefined): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '');
+    return (
+      (host.endsWith('youtube.com') && (u.searchParams.has('v') || u.pathname.startsWith('/shorts/'))) ||
+      host === 'youtu.be'
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function Popup() {
   const [dueCount, setDueCount] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<chrome.tabs.Tab | null>(null);
 
   useEffect(() => {
     cardRepo.getDueCount().then(setDueCount);
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      setActiveTab(tabs[0] ?? null);
+    });
   }, []);
+
+  const onYouTube = isYouTubeWatchUrl(activeTab?.url);
+
+  function captureVideo() {
+    if (!activeTab?.url) return;
+    chrome.runtime.sendMessage(
+      { type: 'capture.fromVideo', payload: { url: activeTab.url } },
+      (response) => {
+        if (response && response.ok === false) {
+          alert(`Couldn't capture video: ${response.error?.message ?? 'unknown error'}`);
+        }
+      },
+    );
+    openSidePanel();
+  }
 
   async function openSidePanel() {
     const win = await chrome.windows.getCurrent();
@@ -73,6 +106,14 @@ export function Popup() {
         >
           ＋ Capture this page
         </button>
+        {onYouTube && (
+          <button
+            onClick={captureVideo}
+            className="w-full py-2 px-4 bg-surface border border-border rounded-md text-sm text-text hover:bg-elevated transition-colors duration-fast"
+          >
+            ▶ Capture this video
+          </button>
+        )}
         <button
           onClick={openSidePanel}
           className="w-full py-2 px-4 bg-surface border border-border rounded-md text-sm text-text hover:bg-elevated transition-colors duration-fast"

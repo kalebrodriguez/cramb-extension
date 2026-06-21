@@ -3,6 +3,14 @@ import { MessageSchema } from '@/lib/messages';
 import { ok, err, type Result } from '@/lib/errors';
 import { getProvider } from '@/background/providers';
 
+/** SHA-256 hex digest of a string, used to de-duplicate captured content. */
+async function sha256Hex(text: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
     handleMessage(raw, sender).then(sendResponse);
@@ -54,8 +62,7 @@ export default defineBackground(() => {
           const sourceName = title || new URL(msg.payload.url).hostname || 'Unknown Source';
 
           // First hash the content to ensure it's unique
-          const contentHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(textContent))
-            .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+          const contentHash = await sha256Hex(textContent);
 
           const source = await sourceRepo.create({
             type: 'article',
@@ -93,8 +100,7 @@ export default defineBackground(() => {
         const sourceName = msg.payload.title || new URL(msg.payload.url).hostname || 'Unknown Source';
         
         // Hash the content
-        const contentHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg.payload.text))
-            .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+        const contentHash = await sha256Hex(msg.payload.text);
 
         const source = await sourceRepo.create({
             type: 'selection',
@@ -118,6 +124,124 @@ export default defineBackground(() => {
         chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
 
         return ok(source);
+      }
+
+      case 'capture.fromVideo': {
+        const { sourceRepo, deckRepo } = await import('@/data/repositories');
+        const { fetchTranscript, NoTranscriptError } = await import('@/background/sources/youtube');
+
+        try {
+          const transcript = await fetchTranscript(msg.payload.url);
+
+          const contentHash = await sha256Hex(transcript.fullText);
+          const source = await sourceRepo.create({
+            type: 'video',
+            url: msg.payload.url,
+            title: transcript.title,
+            author: transcript.author,
+            siteName: 'YouTube',
+            rawText: transcript.fullText,
+            excerpt: transcript.fullText.substring(0, 150) + '…',
+            segments: transcript.segments,
+            contentHash,
+          });
+
+          const existingDecks = await deckRepo.listAll();
+          if (!existingDecks.find((d) => d.name === transcript.title)) {
+            await deckRepo.create({ name: transcript.title, sourceId: source.id });
+          }
+
+          await chrome.storage.local.set({ activeCaptureSourceId: source.id });
+          chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
+
+          return ok(source);
+        } catch (e) {
+          if (e instanceof NoTranscriptError) {
+            return err('EXTRACTION_EMPTY', e.message);
+          }
+          return err('UNKNOWN', `Video capture failed: ${String(e)}`);
+        }
+      }
+
+      case 'deck.rename': {
+        const { deckRepo } = await import('@/data/repositories');
+        const deck = await deckRepo.getById(msg.payload.deckId);
+        if (!deck) return err('UNKNOWN', 'Deck not found.');
+        await deckRepo.update(msg.payload.deckId, { name: msg.payload.name });
+        return ok({ id: msg.payload.deckId, name: msg.payload.name });
+      }
+
+      case 'deck.merge': {
+        const { deckRepo } = await import('@/data/repositories');
+        try {
+          const moved = await deckRepo.merge(msg.payload.sourceDeckId, msg.payload.targetDeckId);
+          return ok({ moved });
+        } catch (e) {
+          return err('UNKNOWN', `Merge failed: ${String(e)}`);
+        }
+      }
+
+      case 'deck.delete': {
+        const { deckRepo } = await import('@/data/repositories');
+        if (msg.payload.deleteCards) {
+          const removed = await deckRepo.deleteWithCards(msg.payload.deckId);
+          return ok({ deletedCards: removed });
+        }
+        await deckRepo.delete(msg.payload.deckId);
+        return ok({ deletedCards: 0 });
+      }
+
+      case 'card.create': {
+        const { cardRepo } = await import('@/data/repositories');
+        try {
+          const card = await cardRepo.create({
+            deckId: msg.payload.deckId,
+            type: msg.payload.type,
+            front: msg.payload.front,
+            back: msg.payload.back,
+            clozeText: msg.payload.clozeText,
+            choices: msg.payload.choices,
+            answerIndex: msg.payload.answerIndex,
+            tags: msg.payload.tags,
+            suspended: false,
+          });
+          return ok(card);
+        } catch (e) {
+          return err('UNKNOWN', `Failed to create card: ${String(e)}`);
+        }
+      }
+
+      case 'card.update': {
+        const { cardRepo } = await import('@/data/repositories');
+        const card = await cardRepo.getById(msg.payload.cardId);
+        if (!card) return err('UNKNOWN', 'Card not found.');
+        await cardRepo.update(msg.payload.cardId, msg.payload.changes);
+        return ok({ id: msg.payload.cardId });
+      }
+
+      case 'card.delete': {
+        const { cardRepo } = await import('@/data/repositories');
+        await cardRepo.delete(msg.payload.cardId);
+        return ok({ id: msg.payload.cardId });
+      }
+
+      case 'card.suspend': {
+        const { cardRepo } = await import('@/data/repositories');
+        if (msg.payload.cardId) {
+          await cardRepo.setSuspended(msg.payload.cardId, msg.payload.suspended);
+          return ok({ count: 1 });
+        }
+        if (msg.payload.deckId) {
+          const count = await cardRepo.setSuspendedByDeck(msg.payload.deckId, msg.payload.suspended);
+          return ok({ count });
+        }
+        return err('UNKNOWN', 'card.suspend requires a cardId or deckId.');
+      }
+
+      case 'search.query': {
+        const { searchRepo } = await import('@/data/repositories');
+        const results = await searchRepo.search(msg.payload.query, msg.payload.limit);
+        return ok(results);
       }
 
       case 'model.test': {
