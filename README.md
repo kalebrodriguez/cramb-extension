@@ -6,11 +6,11 @@ Cramb is a privacy-first, open-source browser extension that turns what you read
 
 ## How it works
 
-1. **Capture** — Highlight text or one-click an article while browsing.
+1. **Capture** — Highlight text, one-click an article, or grab a YouTube video's transcript while browsing.
 2. **Generate** — An LLM (your own API key or local Ollama) creates editable flashcards.
 3. **Review** — Cards are scheduled with FSRS so you review at the right time, right in your browser.
 
-Everything stays on your device. Export to Anki anytime.
+Everything stays on your device. Anki-compatible by design — export is coming in v0.4.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ pnpm build        # production build (Chromium + Firefox)
 
 ## Tech stack
 
-TypeScript (strict) · WXT (MV3) · React 18 · Tailwind CSS · Zustand · Dexie (IndexedDB) · ts-fsrs · Zod · Vitest · Playwright
+TypeScript (strict) · WXT (MV3) · React 19 · Tailwind v4 · Zustand · Dexie (IndexedDB) · ts-fsrs · Zod · Vitest · Playwright
 
 ## Contributing
 
