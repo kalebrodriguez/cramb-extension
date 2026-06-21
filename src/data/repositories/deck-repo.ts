@@ -37,6 +37,33 @@ export const deckRepo = {
     await db.decks.delete(id);
   },
 
+  /** Delete a deck and all of its cards in one transaction. */
+  async deleteWithCards(id: string): Promise<number> {
+    return db.transaction('rw', db.decks, db.cards, async () => {
+      const removed = await db.cards.where('deckId').equals(id).delete();
+      await db.decks.delete(id);
+      return removed;
+    });
+  },
+
+  /**
+   * Move every card from `sourceId` into `targetId`, then delete the now-empty
+   * source deck. Returns the number of cards moved. No-op if ids are equal.
+   */
+  async merge(sourceId: string, targetId: string): Promise<number> {
+    if (sourceId === targetId) return 0;
+    return db.transaction('rw', db.decks, db.cards, async () => {
+      const target = await db.decks.get(targetId);
+      if (!target) throw new Error(`Target deck ${targetId} not found`);
+      const moved = await db.cards
+        .where('deckId')
+        .equals(sourceId)
+        .modify({ deckId: targetId, updatedAt: Date.now() });
+      await db.decks.delete(sourceId);
+      return moved;
+    });
+  },
+
   async getCardCount(deckId: string): Promise<number> {
     return db.cards.where('deckId').equals(deckId).count();
   },
