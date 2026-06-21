@@ -2,6 +2,8 @@ import { GenerationOutputSchema } from '@/data/schemas/generation';
 import type { GeneratedCard } from '@/data/schemas/generation';
 import { loadApiKey } from '@/lib/settings';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
+import { providerError } from './http-error';
+import { parseModelJson } from './json';
 import type { LLMProvider, GenerateInput } from './types';
 
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
@@ -44,7 +46,7 @@ export class AnthropicProvider implements LLMProvider {
       throw new Error('RATE_LIMITED');
     }
     if (!response.ok) {
-      throw new Error('PROVIDER_ERROR');
+      throw await providerError(response);
     }
 
     const json = await response.json();
@@ -53,7 +55,7 @@ export class AnthropicProvider implements LLMProvider {
     );
     if (!textBlock?.text) throw new Error('BAD_LLM_OUTPUT');
 
-    const parsed = JSON.parse(textBlock.text);
+    const parsed = parseModelJson(textBlock.text);
     const result = GenerationOutputSchema.safeParse(parsed);
     if (!result.success) throw new Error('BAD_LLM_OUTPUT');
 

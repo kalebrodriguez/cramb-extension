@@ -2,6 +2,8 @@ import { GenerationOutputSchema } from '@/data/schemas/generation';
 import type { GeneratedCard } from '@/data/schemas/generation';
 import { loadApiKey } from '@/lib/settings';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
+import { providerError } from './http-error';
+import { parseModelJson } from './json';
 import type { LLMProvider, GenerateInput } from './types';
 
 const OPENAI_API = 'https://api.openai.com/v1/chat/completions';
@@ -43,14 +45,14 @@ export class OpenAIProvider implements LLMProvider {
       throw new Error('RATE_LIMITED');
     }
     if (!response.ok) {
-      throw new Error('PROVIDER_ERROR');
+      throw await providerError(response);
     }
 
     const json = await response.json();
     const content = json.choices?.[0]?.message?.content;
     if (!content) throw new Error('BAD_LLM_OUTPUT');
 
-    const parsed = JSON.parse(content);
+    const parsed = parseModelJson(content);
     const result = GenerationOutputSchema.safeParse(parsed);
     if (!result.success) throw new Error('BAD_LLM_OUTPUT');
 
