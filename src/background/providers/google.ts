@@ -2,6 +2,8 @@ import { GenerationOutputSchema } from '@/data/schemas/generation';
 import type { GeneratedCard } from '@/data/schemas/generation';
 import { loadApiKey } from '@/lib/settings';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
+import { providerError } from './http-error';
+import { parseModelJson } from './json';
 import type { LLMProvider, GenerateInput } from './types';
 
 export class GoogleProvider implements LLMProvider {
@@ -47,14 +49,14 @@ export class GoogleProvider implements LLMProvider {
       throw new Error('RATE_LIMITED');
     }
     if (!response.ok) {
-      throw new Error('PROVIDER_ERROR');
+      throw await providerError(response);
     }
 
     const json = await response.json();
     const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error('BAD_LLM_OUTPUT');
 
-    const parsed = JSON.parse(text);
+    const parsed = parseModelJson(text);
     const result = GenerationOutputSchema.safeParse(parsed);
     if (!result.success) throw new Error('BAD_LLM_OUTPUT');
 
