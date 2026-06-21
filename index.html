@@ -8,182 +8,472 @@
   <meta property="og:title" content="Cramb — Remember what you read" />
   <meta property="og:description" content="Turn what you read and watch online into spaced-repetition flashcards. Privacy-first, local-first, bring your own AI key." />
   <meta property="og:type" content="website" />
+  <!-- Crisp inline SVG favicon (the sparkle mark) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0 L14.4 9.6 L24 12 L14.4 14.4 L12 24 L9.6 14.4 L0 12 L9.6 9.6 Z' fill='%238C7DF7'/%3E%3C/svg%3E" />
   <style>
     :root {
-      --bg: #0F172A;
-      --surface: #1E293B;
-      --elevated: #243044;
-      --border: #334155;
-      --border-subtle: #1f2b3d;
+      --bg: #0B1120;
+      --bg-2: #0F172A;
+      --surface: #161F33;
+      --elevated: #1E293B;
+      --border: #2A3852;
+      --border-subtle: #1a2336;
       --text: #F8FAFC;
-      --muted: #94A3B8;
+      --muted: #9FB0C7;
       --faint: #64748B;
       --brand: #8C7DF7;
+      --brand-2: #6D5EF6;
       --brand-strong: #7C6BF0;
       --on-brand: #FFFFFF;
-      --radius: 14px;
+      --accent: #F5A524;
+      --radius: 16px;
+      --maxw: 940px;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      * { transition: none !important; animation: none !important; }
-    }
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Inter", sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
     }
     a { color: var(--brand); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+    a:hover { color: #ab9eff; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 
+    /* ---------- Ambient background ---------- */
+    .bg-fx { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5;
+      will-change: transform;
+    }
+    .blob.b1 { width: 620px; height: 620px; top: -220px; left: -160px;
+      background: radial-gradient(circle at 30% 30%, #6D5EF6, transparent 70%); }
+    .blob.b2 { width: 540px; height: 540px; top: 240px; right: -200px;
+      background: radial-gradient(circle at 60% 40%, #7C3AED, transparent 70%); opacity: 0.4; }
+    .blob.b3 { width: 460px; height: 460px; top: 1200px; left: 40%;
+      background: radial-gradient(circle at 50% 50%, #F5A524, transparent 70%); opacity: 0.16; }
+    .grid-fx {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 18%, black, transparent 72%);
+      -webkit-mask-image: radial-gradient(circle at 50% 18%, black, transparent 72%);
+      opacity: 0.5;
+    }
+
+    /* ---------- Scroll progress ---------- */
+    .progress {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%; z-index: 100;
+      background: linear-gradient(90deg, var(--brand-2), var(--brand), var(--accent));
+      box-shadow: 0 0 12px rgba(140,125,247,0.6);
+    }
+
+    /* ---------- Custom cursor ---------- */
+    .cursor-dot, .cursor-ring { position: fixed; top: 0; left: 0; z-index: 200; pointer-events: none;
+      border-radius: 50%; transform: translate(-50%, -50%); }
+    .cursor-dot { width: 7px; height: 7px; background: var(--brand); }
+    .cursor-ring { width: 34px; height: 34px; border: 1.5px solid rgba(140,125,247,0.7);
+      transition: width .18s ease, height .18s ease, background .18s ease, border-color .18s ease, opacity .2s ease;
+      backdrop-filter: invert(6%); }
+    .cursor-ring.hov { width: 56px; height: 56px; background: rgba(140,125,247,0.12); border-color: var(--brand); }
+    body.has-cursor { cursor: none; }
+    body.has-cursor a, body.has-cursor button { cursor: none; }
+
+    /* ---------- Header ---------- */
     header.site {
+      position: sticky; top: 0; z-index: 60;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 24px; max-width: 880px; margin: 0 auto;
+      padding: 16px 24px; max-width: var(--maxw); margin: 0 auto;
+      transition: padding .25s ease;
     }
-    .logo { font-weight: 700; font-size: 1.15rem; color: var(--brand); }
-    .logo .mark { margin-right: 6px; }
-    nav a { color: var(--muted); margin-left: 20px; font-size: 0.92rem; }
-    nav a:hover { color: var(--text); text-decoration: none; }
+    .logo { display: inline-flex; align-items: center; gap: 9px; font-weight: 700; font-size: 1.2rem;
+      letter-spacing: -0.01em; color: var(--text); }
+    .logo svg { width: 22px; height: 22px; display: block; filter: drop-shadow(0 0 6px rgba(140,125,247,0.55)); }
+    .logo .word { background: linear-gradient(180deg, #fff, #cfc8ff); -webkit-background-clip: text;
+      background-clip: text; color: transparent; }
+    nav a { color: var(--muted); margin-left: 22px; font-size: 0.92rem; position: relative; }
+    nav a::after { content: ""; position: absolute; left: 0; bottom: -4px; height: 1.5px; width: 0;
+      background: var(--brand); transition: width .22s ease; }
+    nav a:hover { color: var(--text); }
+    nav a:hover::after { width: 100%; }
+    .nav-ghost { display: none; }
 
-    .hero { text-align: center; padding: 72px 0 56px; }
-    .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
-    .hero .tagline { color: var(--brand); font-weight: 600; font-size: 1.1rem; margin: 0 0 18px; }
-    .hero p.lead { color: var(--muted); font-size: 1.15rem; max-width: 620px; margin: 0 auto 32px; }
+    /* ---------- Reveal ---------- */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+    .reveal.in { opacity: 1; transform: none; }
+    .reveal.d1 { transition-delay: .08s; }
+    .reveal.d2 { transition-delay: .16s; }
+    .reveal.d3 { transition-delay: .24s; }
 
-    .cta { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    /* ---------- Hero ---------- */
+    .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center;
+      padding: 64px 0 72px; }
+    .hero .pill { display: inline-flex; align-items: center; gap: 8px; font-size: .8rem; color: var(--muted);
+      background: rgba(140,125,247,0.08); border: 1px solid var(--border); padding: 6px 12px; border-radius: 9999px; margin-bottom: 18px; }
+    .hero .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .hero h1 { font-size: clamp(2.3rem, 5.4vw, 3.6rem); line-height: 1.05; margin: 0 0 18px; letter-spacing: -0.03em; }
+    .hero h1 .grad { background: linear-gradient(110deg, var(--brand) 0%, #b6a8ff 45%, var(--accent) 110%);
+      -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p.lead { color: var(--muted); font-size: 1.12rem; max-width: 520px; margin: 0 0 30px; }
+    .cta { display: inline-flex; gap: 14px; flex-wrap: wrap; align-items: center; }
     .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 22px; border-radius: 9999px; font-weight: 600; font-size: 0.98rem;
-      border: 1px solid var(--border); transition: background 120ms ease, opacity 120ms ease;
-    }
-    .btn-primary { background: var(--brand-strong); color: var(--on-brand); border-color: var(--brand-strong); }
-    .btn-primary:hover { opacity: 0.9; text-decoration: none; }
+      display: inline-flex; align-items: center; gap: 8px; position: relative;
+      padding: 13px 24px; border-radius: 9999px; font-weight: 600; font-size: 0.98rem;
+      border: 1px solid var(--border); transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease; }
+    .btn-primary { background: linear-gradient(180deg, var(--brand), var(--brand-strong)); color: var(--on-brand);
+      border-color: transparent; box-shadow: 0 8px 24px -8px rgba(109,94,246,0.8); }
+    .btn-primary:hover { box-shadow: 0 12px 30px -8px rgba(109,94,246,0.95); color: #fff; }
     .btn-ghost { background: var(--surface); color: var(--text); }
-    .btn-ghost:hover { background: var(--elevated); text-decoration: none; }
-    .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-    .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-    .soon { font-size: 0.72rem; color: var(--faint); display: block; margin-top: 8px; }
+    .btn-ghost:hover { background: var(--elevated); color: var(--text); }
+    .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+    .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+    .soon { font-size: 0.72rem; color: var(--faint); display: block; margin-top: 9px; }
 
-    section { padding: 48px 0; border-top: 1px solid var(--border-subtle); }
-    section h2 { font-size: 1.5rem; margin: 0 0 28px; text-align: center; }
+    /* ---------- Hero flip card ---------- */
+    .demo { perspective: 1200px; display: flex; justify-content: center; }
+    .flip { width: 300px; height: 200px; position: relative; transform-style: preserve-3d;
+      transition: transform .7s cubic-bezier(.16,1,.3,1); cursor: pointer; }
+    .flip.flipped { transform: rotateY(180deg); }
+    .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius);
+      background: linear-gradient(160deg, var(--surface), var(--bg-2)); border: 1px solid var(--border);
+      padding: 22px; display: flex; flex-direction: column; box-shadow: 0 24px 60px -24px rgba(0,0,0,.7); }
+    .face .tag { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
+    .face .q { font-size: 1.18rem; font-weight: 600; margin-top: auto; }
+    .face .hint { font-size: .76rem; color: var(--faint); margin-top: 10px; }
+    .back { transform: rotateY(180deg); }
+    .back .a { font-size: 1.02rem; color: var(--text); margin-top: auto; }
+    .back .src { font-size: .72rem; color: var(--muted); margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; }
+    .ratings { display: flex; gap: 6px; margin-top: 12px; }
+    .ratings span { flex: 1; text-align: center; font-size: .66rem; padding: 5px 0; border-radius: 7px; font-weight: 600; }
+    .r-again { background: rgba(239,68,68,.16); color: #f87171; }
+    .r-hard  { background: rgba(245,158,11,.16); color: #fbbf4d; }
+    .r-good  { background: rgba(34,197,94,.16); color: #4ade80; }
+    .r-easy  { background: rgba(59,130,246,.16); color: #60a5fa; }
 
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    /* ---------- Sections ---------- */
+    section { padding: 56px 0; }
+    section.bordered { border-top: 1px solid var(--border-subtle); }
+    .eyebrow { text-align: center; color: var(--brand); font-weight: 700; font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; }
+    section h2 { font-size: clamp(1.5rem, 3.2vw, 2rem); margin: 8px 0 32px; text-align: center; letter-spacing: -0.02em; }
+
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
     .card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 24px;
-    }
-    .card .n { color: var(--brand); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    .card h3 { margin: 10px 0 8px; font-size: 1.1rem; }
+      position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 26px; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      transform-style: preserve-3d; overflow: hidden; }
+    .card::before { content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity .25s ease;
+      background: radial-gradient(420px circle at var(--mx,50%) var(--my,0%), rgba(140,125,247,0.16), transparent 60%); }
+    .card:hover { border-color: #3b4d6e; box-shadow: 0 24px 50px -28px rgba(0,0,0,.8); }
+    .card:hover::before { opacity: 1; }
+    .card .ic { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center;
+      background: rgba(140,125,247,0.12); border: 1px solid var(--border); font-size: 1.1rem; margin-bottom: 14px; }
+    .card .n { color: var(--brand); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .card h3 { margin: 6px 0 8px; font-size: 1.12rem; }
     .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
 
-    .privacy { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
-    .privacy ul { margin: 0; padding-left: 20px; color: var(--muted); }
-    .privacy li { margin: 8px 0; }
-    .privacy strong { color: var(--text); }
+    .privacy { background: linear-gradient(160deg, var(--surface), var(--bg-2));
+      border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; }
+    .privacy ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .privacy li { padding: 20px 22px; color: var(--muted); border-radius: 12px; transition: background .2s ease; }
+    .privacy li:hover { background: rgba(255,255,255,0.02); }
+    .privacy li .h { display: flex; align-items: center; gap: 9px; color: var(--text); font-weight: 600; margin-bottom: 5px; }
+    .privacy li .h .chk { color: var(--brand); }
 
-    pre {
-      background: #0b1220; border: 1px solid var(--border); border-radius: 10px;
-      padding: 16px; overflow-x: auto; font-size: 0.88rem; color: #cbd5e1;
-    }
+    .install-box { max-width: 680px; margin: 0 auto; }
+    .codewrap { position: relative; }
+    pre { background: #070C18; border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 18px; overflow-x: auto; font-size: 0.86rem; color: #cbd5e1; margin: 0; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .copy { position: absolute; top: 10px; right: 10px; font-size: .72rem; color: var(--muted);
+      background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
+    .copy:hover { color: var(--text); border-color: var(--brand); }
+    .copy.ok { color: #4ade80; border-color: #4ade80; }
+    .muted-center { color: var(--muted); text-align: center; max-width: 620px; margin: 0 auto; }
 
-    footer.site { text-align: center; color: var(--faint); font-size: 0.85rem; padding: 40px 24px 56px; border-top: 1px solid var(--border-subtle); }
-    footer.site a { color: var(--muted); margin: 0 8px; }
+    footer.site { text-align: center; color: var(--faint); font-size: 0.85rem; padding: 48px 24px 64px;
+      border-top: 1px solid var(--border-subtle); margin-top: 24px; }
+    footer.site a { color: var(--muted); margin: 0 9px; }
+    footer .flogo { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); margin-bottom: 12px; font-weight: 600; }
+    footer .flogo svg { width: 16px; height: 16px; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; text-align: center; padding-top: 40px; }
+      .hero p.lead { margin-left: auto; margin-right: auto; }
+      .cta { justify-content: center; }
+      .privacy ul { grid-template-columns: 1fr; }
+      nav .nav-link { display: none; }
+    }
+
+    /* ---------- Reduced motion / touch: drop the fancy bits ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
   </style>
 </head>
 <body>
+  <div class="progress" id="progress"></div>
+  <div class="bg-fx">
+    <div class="blob b1" data-speed="0.06"></div>
+    <div class="blob b2" data-speed="0.10"></div>
+    <div class="blob b3" data-speed="0.04"></div>
+  </div>
+  <div class="grid-fx"></div>
+
+  <div class="cursor-ring" id="ring" aria-hidden="true"></div>
+  <div class="cursor-dot" id="dot" aria-hidden="true"></div>
+
   <header class="site">
-    <span class="logo"><span class="mark">✦</span>Cramb</span>
+    <span class="logo">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#A99EFB"/><stop offset="1" stop-color="#6D5EF6"/>
+          </linearGradient>
+        </defs>
+        <path d="M12 0 L14.4 9.6 L24 12 L14.4 14.4 L12 24 L9.6 14.4 L0 12 L9.6 9.6 Z" fill="url(#lg)"/>
+      </svg>
+      <span class="word">cramb</span>
+    </span>
     <nav>
-      <a href="#how">How it works</a>
-      <a href="#privacy">Privacy</a>
-      <a href="#install">Install</a>
+      <a class="nav-link" href="#how">How it works</a>
+      <a class="nav-link" href="#privacy">Privacy</a>
+      <a class="nav-link" href="#install">Install</a>
       <a href="https://github.com/kalebrodriguez/cramb-extension">GitHub</a>
     </nav>
   </header>
 
   <main class="wrap">
-    <section class="hero" style="border-top:none">
-      <p class="tagline">Remember what you read.</p>
-      <h1>Turn what you read into memory.</h1>
-      <p class="lead">
-        Cramb is a privacy-first, open-source browser extension that turns articles
-        and YouTube videos into spaced-repetition flashcards — so the things you
-        learn actually stick.
-      </p>
-      <div class="cta">
-        <span>
-          <a class="btn btn-primary" aria-disabled="true" href="#install">Add to Chrome</a>
-          <span class="soon">Coming to the Chrome Web Store</span>
-        </span>
-        <span>
-          <a class="btn btn-ghost" href="https://github.com/kalebrodriguez/cramb-extension">View on GitHub</a>
-        </span>
+    <section class="hero">
+      <div>
+        <span class="pill reveal"><span class="dot"></span> Privacy-first · open source · BYO AI key</span>
+        <h1 class="reveal d1">Turn what you read<br>into <span class="grad">memory.</span></h1>
+        <p class="lead reveal d2">
+          Cramb is an open-source browser extension that turns articles and YouTube
+          videos into spaced-repetition flashcards — so the things you learn online
+          actually stick.
+        </p>
+        <div class="cta reveal d3">
+          <span>
+            <a class="btn btn-primary magnetic" aria-disabled="true" href="#install">✦ Add to Chrome</a>
+            <span class="soon">Coming to the Chrome Web Store</span>
+          </span>
+          <a class="btn btn-ghost magnetic" href="https://github.com/kalebrodriguez/cramb-extension">View on GitHub →</a>
+        </div>
+      </div>
+      <div class="demo reveal d2">
+        <div class="flip" id="flip" role="button" tabindex="0" aria-label="Demo flashcard — activate to flip">
+          <div class="face front">
+            <span class="tag">Basic · react.dev</span>
+            <div class="q">What does <code>useMemo</code> return?</div>
+            <div class="hint">click to reveal ↵</div>
+          </div>
+          <div class="face back">
+            <span class="tag">Answer</span>
+            <div class="a">A memoized value that only recomputes when its dependencies change.</div>
+            <div class="ratings">
+              <span class="r-again">Again</span><span class="r-hard">Hard</span>
+              <span class="r-good">Good</span><span class="r-easy">Easy</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="how">
-      <h2>How it works</h2>
+    <section id="how" class="bordered">
+      <p class="eyebrow reveal">The loop</p>
+      <h2 class="reveal d1">How it works</h2>
       <div class="steps">
-        <div class="card">
+        <div class="card tilt reveal d1">
+          <div class="ic">✦</div>
           <span class="n">1 · Capture</span>
           <h3>Highlight or one-click</h3>
-          <p>Select text, capture an article, or grab a YouTube video's transcript — in seconds, without leaving the page.</p>
+          <p>Select text, capture an article, or grab a YouTube transcript — in seconds, without leaving the page.</p>
         </div>
-        <div class="card">
+        <div class="card tilt reveal d2">
+          <div class="ic">✎</div>
           <span class="n">2 · Generate</span>
           <h3>Editable cards</h3>
           <p>An AI model — your own API key or a local Ollama model — drafts flashcards. You review and edit before anything is saved.</p>
         </div>
-        <div class="card">
+        <div class="card tilt reveal d3">
+          <div class="ic">↻</div>
           <span class="n">3 · Review</span>
           <h3>Right on schedule</h3>
-          <p>Cards are scheduled with the FSRS algorithm so you review at the optimal moment — keyboard-first, right in your browser.</p>
+          <p>Cards are scheduled with the FSRS algorithm so you review at the optimal moment — keyboard-first, in your browser.</p>
         </div>
       </div>
     </section>
 
-    <section id="privacy">
-      <h2>Private by design</h2>
-      <div class="privacy">
+    <section id="privacy" class="bordered">
+      <p class="eyebrow reveal">Your data, your device</p>
+      <h2 class="reveal d1">Private by design</h2>
+      <div class="privacy reveal d1">
         <ul>
-          <li><strong>Local-first.</strong> Your sources and cards live in your browser (IndexedDB) — there's no Cramb account and no backend.</li>
-          <li><strong>Bring your own key.</strong> Cramb never ships or shares an API key. It talks only to the model provider you choose.</li>
-          <li><strong>No tracking.</strong> No analytics, no telemetry, no phone-home. Your reading stays yours.</li>
-          <li><strong>Open source.</strong> Every line is on GitHub under the MIT license — audit it, fork it, contribute.</li>
+          <li><div class="h"><span class="chk">✓</span> Local-first</div>Your sources and cards live in your browser (IndexedDB) — there's no Cramb account and no backend.</li>
+          <li><div class="h"><span class="chk">✓</span> Bring your own key</div>Cramb never ships or shares an API key. It talks only to the model provider you choose.</li>
+          <li><div class="h"><span class="chk">✓</span> No tracking</div>No analytics, no telemetry, no phone-home. Your reading stays yours.</li>
+          <li><div class="h"><span class="chk">✓</span> Open source</div>Every line is on GitHub under the MIT license — audit it, fork it, contribute.</li>
         </ul>
       </div>
     </section>
 
-    <section id="install">
-      <h2>Install</h2>
-      <p style="color:var(--muted); text-align:center; max-width:620px; margin:0 auto 24px;">
-        Cramb isn't on the Chrome Web Store or Firefox Add-ons yet. Until then, you
-        can build it from source and load it as an unpacked extension:
-      </p>
-<pre><code>git clone https://github.com/kalebrodriguez/cramb-extension
+    <section id="install" class="bordered">
+      <p class="eyebrow reveal">Get started</p>
+      <h2 class="reveal d1">Install</h2>
+      <div class="install-box reveal d1">
+        <p class="muted-center" style="margin-bottom:22px;">
+          Cramb isn't on the Chrome Web Store or Firefox Add-ons yet. Until then, build
+          it from source and load it as an unpacked extension:
+        </p>
+        <div class="codewrap">
+          <button class="copy" id="copyBtn">Copy</button>
+<pre><code id="code">git clone https://github.com/kalebrodriguez/cramb-extension
 cd cramb-extension
 pnpm install
 pnpm build        # produces .output/chrome-mv3</code></pre>
-      <p style="color:var(--muted); text-align:center; max-width:620px; margin:24px auto 0;">
-        Then open <code>chrome://extensions</code>, enable <strong>Developer mode</strong>,
-        click <strong>Load unpacked</strong>, and select the <code>.output/chrome-mv3</code> folder.
-      </p>
+        </div>
+        <p class="muted-center" style="margin-top:22px;">
+          Then open <code>chrome://extensions</code>, enable <strong>Developer mode</strong>,
+          click <strong>Load unpacked</strong>, and select the <code>.output/chrome-mv3</code> folder.
+        </p>
+      </div>
     </section>
   </main>
 
   <footer class="site">
+    <div class="flogo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L14.4 9.6 L24 12 L14.4 14.4 L12 24 L9.6 14.4 L0 12 L9.6 9.6 Z" fill="#8C7DF7"/></svg>
+      cramb
+    </div>
     <div>
       <a href="https://github.com/kalebrodriguez/cramb-extension">GitHub</a>
       <a href="https://github.com/kalebrodriguez/cramb-extension/blob/main/LICENSE">MIT License</a>
       <a href="https://github.com/kalebrodriguez/cramb-extension/issues">Report an issue</a>
     </div>
-    <p style="margin-top:14px">✦ Cramb — remember what you read.</p>
+    <p style="margin-top:14px">Remember what you read.</p>
   </footer>
+
+  <script>
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = matchMedia('(pointer: fine)').matches;
+
+    // ---- Scroll progress ----
+    const progress = document.getElementById('progress');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      progress.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+    };
+    document.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // ---- Reveal on scroll ----
+    if ('IntersectionObserver' in window && !reduce) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+    }
+
+    // ---- Parallax blobs ----
+    if (!reduce) {
+      const blobs = [...document.querySelectorAll('.blob')];
+      let ticking = false;
+      document.addEventListener('scroll', () => {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          blobs.forEach((b) => { b.style.transform = `translateY(${y * parseFloat(b.dataset.speed)}px)`; });
+          ticking = false;
+        });
+      }, { passive: true });
+    }
+
+    // ---- Flip card ----
+    const flip = document.getElementById('flip');
+    const doFlip = () => flip.classList.toggle('flipped');
+    flip.addEventListener('click', doFlip);
+    flip.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doFlip(); } });
+
+    // ---- Copy button ----
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(document.getElementById('code').innerText);
+        copyBtn.textContent = 'Copied ✓'; copyBtn.classList.add('ok');
+        setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('ok'); }, 1600);
+      } catch { copyBtn.textContent = 'Press ⌘C'; }
+    });
+
+    // ---- Card spotlight (mouse position for ::before) ----
+    if (finePointer) {
+      document.querySelectorAll('.card').forEach((card) => {
+        card.addEventListener('mousemove', (e) => {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+          card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        });
+      });
+    }
+
+    // ---- Subtle 3D tilt on cards ----
+    if (finePointer && !reduce) {
+      document.querySelectorAll('.tilt').forEach((el) => {
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width - 0.5;
+          const py = (e.clientY - r.top) / r.height - 0.5;
+          el.style.transform = `perspective(700px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg) translateY(-3px)`;
+        });
+        el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+      });
+    }
+
+    // ---- Magnetic buttons ----
+    if (finePointer && !reduce) {
+      document.querySelectorAll('.magnetic').forEach((el) => {
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          el.style.transform = `translate(${((e.clientX - r.left) / r.width - 0.5) * 10}px, ${((e.clientY - r.top) / r.height - 0.5) * 8}px)`;
+        });
+        el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+      });
+    }
+
+    // ---- Custom cursor ----
+    if (finePointer && !reduce) {
+      document.body.classList.add('has-cursor');
+      const dot = document.getElementById('dot'), ring = document.getElementById('ring');
+      let rx = innerWidth / 2, ry = innerHeight / 2, mx = rx, my = ry;
+      addEventListener('mousemove', (e) => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+      });
+      const loop = () => {
+        rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+        ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+        requestAnimationFrame(loop);
+      };
+      loop();
+      document.querySelectorAll('a, button, .flip, .card').forEach((el) => {
+        el.addEventListener('mouseenter', () => ring.classList.add('hov'));
+        el.addEventListener('mouseleave', () => ring.classList.remove('hov'));
+      });
+      addEventListener('mouseleave', () => { dot.style.opacity = ring.style.opacity = '0'; });
+      addEventListener('mouseenter', () => { dot.style.opacity = ring.style.opacity = '1'; });
+    }
+  </script>
 </body>
 </html>
