@@ -18,7 +18,7 @@ const PROVIDERS: { id: Provider; label: string }[] = [
 
 const DEFAULT_MODELS: Record<Provider, string> = {
   openai: 'gpt-4o-mini',
-  anthropic: 'claude-sonnet-4-20250514',
+  anthropic: 'claude-sonnet-4-6',
   google: 'gemini-2.0-flash',
   ollama: 'llama3.2',
 };

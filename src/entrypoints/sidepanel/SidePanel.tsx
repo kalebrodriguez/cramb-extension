@@ -68,9 +68,9 @@ function ReviewEngine({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     // Basic queue load: grab all due cards. We should ideally order by due date.
     // For M2, we pull up to 50 due cards at a time to review.
-    chrome.runtime.sendMessage({ type: 'review.next', payload: {} }).then((res: { ok?: boolean; value?: { cards?: Card[] } }) => {
-       if (res && res.ok && res.value?.cards) {
-          setQueue(res.value.cards);
+    chrome.runtime.sendMessage({ type: 'review.next', payload: {} }).then((res: { ok?: boolean; data?: { cards?: Card[] } }) => {
+       if (res && res.ok && res.data?.cards) {
+          setQueue(res.data.cards);
        }
     }).catch(console.error);
   }, []);
@@ -267,9 +267,9 @@ export function SidePanel() {
           options: { maxCards: 8, cardTypes: ['basic', 'cloze'] },
         },
       });
-      if (result.ok && result.value) {
+      if (result.ok && result.data) {
         // Output from generation logic might be GenerationOutput object or Array
-        const cards = Array.isArray(result.value) ? result.value : result.value.cards;
+        const cards = Array.isArray(result.data) ? result.data : result.data.cards;
         setGeneratedCards(cards || []);
       } else {
         // Better error handling surfacing
