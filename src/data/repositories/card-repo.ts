@@ -84,4 +84,17 @@ export const cardRepo = {
   async getByDeck(deckId: string): Promise<Card[]> {
     return db.cards.where('deckId').equals(deckId).toArray();
   },
+
+  /** Suspend or unsuspend a single card (suspended cards are skipped in review). */
+  async setSuspended(id: string, suspended: boolean): Promise<void> {
+    await db.cards.update(id, { suspended, updatedAt: Date.now() });
+  },
+
+  /** Suspend or unsuspend every card in a deck. Returns the number affected. */
+  async setSuspendedByDeck(deckId: string, suspended: boolean): Promise<number> {
+    return db.cards
+      .where('deckId')
+      .equals(deckId)
+      .modify({ suspended, updatedAt: Date.now() });
+  },
 };
