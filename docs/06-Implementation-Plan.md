@@ -59,7 +59,7 @@
 **Goal:** breadth + the management surfaces real use requires.
 
 - [x] YouTube transcript adapter → cards with timestamp deep-links. *(background adapter + `capture.fromVideo`; transcript segments stored on source for deep-links)*
-- [x] Manual card creation; deck management (rename/merge/delete/suspend). *(repo + message layer + popup video entry; full management UI pending)*
+- [x] Manual card creation; deck management (rename/merge/delete/suspend). *(repo + message layer + side-panel management UI: Decks view, deck detail, manual cards)*
 - [x] Full-text search across cards + sources. *(`searchRepo` + `search.query`)*
 - [x] Quiz (MCQ) generation mode. *(prompt + Zod refinement; opt-in via `cardTypes`)*
 
