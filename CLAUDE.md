@@ -88,7 +88,7 @@ docs/           the 6 product/eng docs
 ---
 
 ## 7. Current status (UPDATE EACH SESSION)
-- **Phase:** M3 logic landed — sources & management (data/message layer); management UI surfaces still to build.
+- **Phase:** M3 complete — sources & management, including the management UI.
 - **What's done:** 
   - WXT + React + Tailwind v4 scaffold; Dexie DB + repository layer.
   - Zod schemas for all entities + messages + LLM output.
@@ -100,8 +100,9 @@ docs/           the 6 product/eng docs
   - Fully integrated `ts-fsrs` scheduling wrapper.
   - Keyboard-first, highly responsive Flashcard Review UI built into the Side Panel (`Space`, `1-4`).
   - Grading persistence back into Dexie (`cards`, `reviews` tables).
-- **Next action:** Build M3 management UI — deck list (rename/merge/delete/suspend), manual card form, and a search box — on top of the now-wired message/repo layer. Then verify YouTube capture against a real video.
-- **Last updated:** 2026-06-20.
+  - Side-panel management UI: Decks tab (rename/merge/delete/suspend), per-deck detail with manual card create/edit/suspend/delete, and a Search tab over cards + sources.
+- **Next action:** Milestone 4 — Interop & insight. Anki `.apkg` export (+ JSON export/import), optional AnkiConnect, and stats (streak, due forecast, retention estimate).
+- **Last updated:** 2026-06-22.
 
 ### Changelog of context
 - 2026-06-20 — Initial product + engineering docs written; stack and architecture chosen.
@@ -109,6 +110,8 @@ docs/           the 6 product/eng docs
 - 2026-06-20 — Validated niche, renamed project to "Cramb". M1 feature loop implemented (extraction -> chunked generation -> editable card queue -> local save).
 - 2026-06-20 — M2 review engine implemented. `ts-fsrs` scheduling hooked up to keyboard-first UI in the Side Panel, logging back to Dexie.
 - 2026-06-20 — M3 logic: YouTube transcript adapter (`src/background/sources/youtube.ts`, `capture.fromVideo`, youtube.com host perm, transcript segments on `Source`); deck management (`merge`/`deleteWithCards`) + card suspend; manual card + deck/card edit messages; `searchRepo` full-text search (`search.query`); MCQ generation (prompt + Zod refinement). Popup gains a YouTube "Capture this video" button. 41 tests pass; typecheck/lint/build clean. Management UI still TODO.
+- 2026-06-20 — Generation hardening: fixed stale Anthropic model default (`claude-sonnet-4-6`), surfaced real provider HTTP errors (`http-error.ts`), tolerate markdown-fenced model JSON (`json.ts`, `parseModelJson`), and fixed the side panel reading `result.value` instead of `result.data`. Verified capture→generate→render end-to-end.
+- 2026-06-22 — M3 management UI built in the Side Panel: `DecksView` (counts + rename/suspend/merge/delete), `DeckDetail` (manual card create + per-card edit/suspend/delete), `SearchView` (cards + sources). Added `src/lib/messaging.ts` typed `send<T>()`. Verified working in-browser. 46 tests pass; typecheck/lint/build clean.
 
 ---
 
