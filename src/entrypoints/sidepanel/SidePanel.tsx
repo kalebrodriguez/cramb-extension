@@ -5,8 +5,11 @@ import type { GeneratedCard } from '@/data/schemas/generation';
 import { getNextIntervals } from '@/lib/scheduler';
 import type { Rating } from 'ts-fsrs';
 import { create } from 'zustand';
+import { DecksView } from './components/DecksView';
+import { DeckDetail } from './components/DeckDetail';
+import { SearchView } from './components/SearchView';
 
-type View = 'home' | 'review' | 'decks' | 'capture';
+type View = 'home' | 'review' | 'decks' | 'search' | 'capture';
 
 // Simple global state for the capture flow
 interface CaptureStore {
@@ -202,6 +205,12 @@ export function SidePanel() {
   const [dueCount, setDueCount] = useState(0);
   const [decks, setDecks] = useState<Deck[]>([]);
   const [activeSource, setActiveSource] = useState<Source | null>(null);
+  const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null);
+
+  const refreshCounts = useCallback(() => {
+    cardRepo.getDueCount().then(setDueCount);
+    deckRepo.listAll().then(setDecks);
+  }, []);
 
   const {
     sourceId,
@@ -330,10 +339,13 @@ export function SidePanel() {
   return (
     <div className="flex flex-col h-screen bg-bg text-text">
       <nav className="flex border-b border-border">
-        {(['home', 'review', 'decks'] as const).map((v) => (
+        {(['home', 'review', 'decks', 'search'] as const).map((v) => (
           <button
             key={v}
-            onClick={() => setView(v)}
+            onClick={() => {
+              setSelectedDeck(null);
+              setView(v);
+            }}
             className={`flex-1 py-3 text-sm font-medium capitalize transition-colors duration-fast ${
               view === v
                 ? 'text-brand border-b-2 border-brand'
@@ -392,27 +404,18 @@ export function SidePanel() {
           </div>
         )}
 
-        {view === 'decks' && (
-          <div className="space-y-2">
-            {decks.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted">No decks yet.</p>
-                <p className="text-sm text-faint mt-1">
-                  Capture your first page to get started.
-                </p>
-              </div>
-            ) : (
-              decks.map((d) => (
-                <div
-                  key={d.id}
-                  className="p-3 bg-surface border border-border rounded-md flex justify-between items-center"
-                >
-                  <span className="text-sm font-medium">{d.name}</span>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+        {view === 'decks' &&
+          (selectedDeck ? (
+            <DeckDetail
+              deck={selectedDeck}
+              onBack={() => setSelectedDeck(null)}
+              onChanged={refreshCounts}
+            />
+          ) : (
+            <DecksView onOpenDeck={setSelectedDeck} onChanged={refreshCounts} />
+          ))}
+
+        {view === 'search' && <SearchView />}
 
         {view === 'capture' && activeSource && (
            <div className="flex flex-col gap-4">
