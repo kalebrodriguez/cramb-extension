@@ -1,6 +1,6 @@
 {
   "name": "cramb",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Remember what you read — a privacy-first browser extension that turns web content into spaced-repetition flashcards.",
   "private": true,
   "type": "module",

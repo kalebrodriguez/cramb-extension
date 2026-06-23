@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-23
+
 ### Added
 
 - **Capture → generate → review core loop.** Capture an article ("Capture this
@@ -40,4 +42,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No remote code; page HTML and model output are sanitized (DOMPurify) and
   validated (Zod).
 
-[Unreleased]: https://github.com/kalebrodriguez/cramb-extension/commits/main
+[Unreleased]: https://github.com/kalebrodriguez/cramb-extension/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/kalebrodriguez/cramb-extension/releases/tag/v1.0.0
