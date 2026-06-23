@@ -152,6 +152,19 @@ const ExportAnki = z.object({
   }),
 });
 
+const LibraryExport = z.object({
+  type: z.literal('library.export'),
+  payload: z.object({}),
+});
+
+const LibraryImport = z.object({
+  type: z.literal('library.import'),
+  payload: z.object({
+    // The parsed backup object; validated against BackupSchema in the handler.
+    backup: z.unknown(),
+  }),
+});
+
 const ModelTest = z.object({
   type: z.literal('model.test'),
   payload: z.object({}),
@@ -175,6 +188,8 @@ export const MessageSchema = z.discriminatedUnion('type', [
   CardSuspend,
   SearchQuery,
   ExportAnki,
+  LibraryExport,
+  LibraryImport,
   ModelTest,
 ]);
 

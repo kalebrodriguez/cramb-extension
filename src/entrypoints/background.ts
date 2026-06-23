@@ -375,6 +375,25 @@ export default defineBackground(() => {
         }
       }
 
+      case 'library.export': {
+        const { backup } = await import('@/data/backup');
+        try {
+          return ok(await backup.export());
+        } catch (e) {
+          return err('UNKNOWN', `Export failed: ${String(e)}`);
+        }
+      }
+
+      case 'library.import': {
+        const { backup } = await import('@/data/backup');
+        try {
+          const counts = await backup.import(msg.payload.backup);
+          return ok(counts);
+        } catch (e) {
+          return err('UNKNOWN', e instanceof Error ? e.message : 'Invalid backup file.');
+        }
+      }
+
       default:
         return err('UNKNOWN', `Unhandled message type: ${msg.type}`);
     }
