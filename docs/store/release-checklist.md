@@ -8,15 +8,16 @@ the broader launch plan and `permissions-justifications.md` for store copy.
 - [ ] `main` is green: `pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm build:firefox`
 - [ ] `pnpm test:e2e` (axe a11y gate) passes on the built extension
 - [ ] `pnpm audit` reviewed — no unaddressed runtime (shipped) vulnerabilities
-- [ ] Manual smoke on Chrome + one Chromium variant (Edge/Brave) + Firefox:
-      capture page → edit → save → review → grade → Anki export
+- [ ] **Manual smoke test** on Chrome + one Chromium variant (Edge/Brave) +
+      Firefox — full click-by-click pass in `manual-smoke-test.md`
 - [ ] Real provider smoke: OpenAI / Anthropic / Google / Ollama each generate once
 - [ ] Error paths: no key, invalid key, rate-limited, no transcript, empty page
 
 ## 2. Version & changelog
 
-- [ ] Bump `version` in `package.json`
-- [ ] Move `CHANGELOG.md` `Unreleased` → `1.0.0` with the date; add compare link
+- [ ] Run **`pnpm release <version>`** — bumps `package.json`, rolls
+      `CHANGELOG.md` (`Unreleased` → the version + date + links), and produces the
+      Chrome/Firefox/sources zips in `.output/`. Use `--dry` first to preview.
 - [ ] Update `CLAUDE.md` §7 status
 
 ## 3. Store assets
@@ -30,14 +31,15 @@ the broader launch plan and `permissions-justifications.md` for store copy.
 
 ## 4. Package & submit
 
-- [ ] `pnpm zip` (Chrome) and `pnpm zip:firefox` (AMO) produce clean artifacts
-- [ ] Chrome Web Store: upload, fill listing + privacy + permissions, submit
-- [ ] Firefox AMO: upload, fill listing, submit (source provided if requested)
+- [ ] Zips produced by `pnpm release` (or `pnpm zip` + `pnpm zip:firefox`):
+      `cramb-<version>-{chrome,firefox,sources}.zip` in `.output/`
+- [ ] Chrome Web Store: upload `…-chrome.zip`, fill listing + privacy + permissions, submit
+- [ ] Firefox AMO: upload `…-firefox.zip` (+ `…-sources.zip` when source is requested), submit
 
 ## 5. Tag & announce
 
-- [ ] `git tag v1.0.0 && git push --tags`
-- [ ] GitHub Release with `CHANGELOG.md` notes + zipped builds attached
+- [ ] `git commit -m "release: v<version>"` then `git tag v<version> && git push --tags`
+- [ ] GitHub Release with `CHANGELOG.md` notes + the `.output/*.zip` builds attached
 - [ ] Open the labeled `good first issue` queue for contributors
 
 ## Post-submission

@@ -17,6 +17,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "icons": "node scripts/generate-icons.mjs",
+    "release": "node scripts/release.mjs",
     "postinstall": "wxt prepare"
   },
   "license": "MIT",

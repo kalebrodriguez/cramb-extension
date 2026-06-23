@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-This section accumulates work toward the first public release (`v1.0.0`).
-
 ### Added
 
 - **Capture → generate → review core loop.** Capture an article ("Capture this
