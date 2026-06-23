@@ -19,6 +19,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['dist/**', '.output/**', '.wxt/**', 'node_modules/**', '*.config.cjs'],
+    ignores: ['dist/**', '.output/**', '.wxt/**', 'node_modules/**', '*.config.cjs', 'scripts/**'],
   },
 );
