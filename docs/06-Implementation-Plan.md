@@ -156,7 +156,19 @@ Rationale: prove the **generate→save** loop before investing in review UI; shi
 ---
 
 ## Post-launch backlog (candidate, prioritize by feedback)
-PDF/EPUB capture · Readwise import · image-occlusion cards · more providers/local presets · tag-based smart decks · **optional E2E-encrypted sync** (changes PRD non-goals) · Safari port · i18n.
+PDF/EPUB capture · Readwise import · image-occlusion cards · more providers/local presets · tag-based smart decks · cross-device **sync** (see below) · Safari port · i18n.
+
+### Multi-device sync (post-v1) — keep the privacy promise
+
+The most common "I wish it had accounts" request is really just **sync** ("my cards on my phone *and* laptop") + cloud backup. We can deliver that **without** becoming a data custodian. Do **not** build a plain backend that stores readable user content — that breaks the local-first wedge, the "we can't read your data" pitch, and golden rules §2–3, and saddles a solo maintainer with infra, cost, and breach liability.
+
+Privacy-preserving options, cheapest first:
+
+- **A — Bring-your-own-cloud (recommended first step).** Sync the existing JSON library export to the *user's own* Google Drive / Dropbox / file-sync folder. Cramb never sees the data; there's no Cramb server to run. Builds directly on the M4 `data/backup.ts` export/import. Lowest cost, fully on-brand. Add a "sync to your cloud" paragraph to the privacy policy when shipped.
+- **B — End-to-end encrypted sync.** A server stores only ciphertext it can't decrypt (à la Bitwarden / Obsidian Sync / Standard Notes). Preserves the privacy promise but requires running infra — reserve for a paid tier if real demand appears.
+- **C — Plain backend + accounts that store readable content.** ❌ Rejected: contradicts the product's identity and non-goals.
+
+Sequence: ship local-first v1 → if multi-device demand is real, do **A** → consider **B** only as a paid tier later.
 
 ---
 
