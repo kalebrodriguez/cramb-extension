@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { cardRepo } from '@/data/repositories';
 import type { Card, Deck } from '@/data/schemas';
 import { send } from '@/lib/messaging';
+import { downloadApkg } from '@/lib/anki/export';
 
 interface DeckDetailProps {
   deck: Deck;
@@ -98,6 +99,24 @@ export function DeckDetail({ deck, onBack, onChanged }: DeckDetailProps) {
           ← Decks
         </button>
         <h2 className="text-sm font-semibold truncate flex-1">{deck.name}</h2>
+        <button
+          onClick={async () => {
+            if (!cards || cards.length === 0) return;
+            setBusy(true);
+            try {
+              await downloadApkg([deck], cards, deck.name);
+            } catch (e) {
+              alert(`Anki export failed: ${e instanceof Error ? e.message : String(e)}`);
+            } finally {
+              setBusy(false);
+            }
+          }}
+          disabled={busy || !cards || cards.length === 0}
+          className="text-xs text-muted hover:text-text shrink-0 disabled:opacity-40"
+          title="Export this deck as an Anki .apkg file"
+        >
+          ⤓ Anki
+        </button>
       </div>
 
       {adding ? (
