@@ -90,8 +90,11 @@ export function Options() {
         <h2 className="text-md font-semibold text-brand">Model & Key</h2>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Provider</label>
+          <label htmlFor="opt-provider" className="block text-sm font-medium mb-1">
+            Provider
+          </label>
           <select
+            id="opt-provider"
             value={settings.provider}
             onChange={(e) => updateProvider(e.target.value as Provider)}
             className="w-full bg-input border border-border rounded-md px-3 py-2 text-text"
@@ -106,9 +109,12 @@ export function Options() {
 
         {!isOllama && (
           <div>
-            <label className="block text-sm font-medium mb-1">API Key</label>
+            <label htmlFor="opt-key" className="block text-sm font-medium mb-1">
+              API Key
+            </label>
             <div className="flex gap-2">
               <input
+                id="opt-key"
                 type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
@@ -128,8 +134,11 @@ export function Options() {
         )}
 
         <div>
-          <label className="block text-sm font-medium mb-1">Model</label>
+          <label htmlFor="opt-model" className="block text-sm font-medium mb-1">
+            Model
+          </label>
           <input
+            id="opt-model"
             type="text"
             value={settings.model}
             onChange={(e) =>
@@ -141,10 +150,11 @@ export function Options() {
 
         {isOllama && (
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label htmlFor="opt-endpoint" className="block text-sm font-medium mb-1">
               Ollama Endpoint
             </label>
             <input
+              id="opt-endpoint"
               type="text"
               value={settings.ollamaEndpoint}
               onChange={(e) =>

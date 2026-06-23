@@ -19,6 +19,15 @@ export default tseslint.config(
     },
   },
   {
+    // Playwright fixtures use `{}` destructuring and a `use` parameter that the
+    // React-hooks rule mistakes for the `use` hook; neither applies to e2e specs.
+    files: ['tests/e2e/**'],
+    rules: {
+      'no-empty-pattern': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
+  {
     ignores: ['dist/**', '.output/**', '.wxt/**', 'node_modules/**', '*.config.cjs', 'scripts/**'],
   },
 );

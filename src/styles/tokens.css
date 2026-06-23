@@ -70,7 +70,9 @@
   --border-subtle: var(--slate-800);
   --text: var(--slate-50);
   --text-muted: var(--slate-400);
-  --text-faint: var(--slate-500);
+  /* Lightened from slate-500 to clear WCAG AA (4.5:1) on the near-black bg
+     while staying a tier below muted. */
+  --text-faint: #8b97ac;
   --brand: var(--violet-400);
   --brand-strong: var(--violet-500);
   --on-brand: var(--slate-0);
@@ -88,7 +90,10 @@
   --border-subtle: var(--slate-100);
   --text: var(--slate-900);
   --text-muted: var(--slate-500);
-  --text-faint: var(--slate-400);
+  /* Darkened from slate-400 to clear WCAG AA (4.5:1) on the near-white bg.
+     On light, "fainter" can't go lighter without failing AA, so faint sits
+     just below muted. */
+  --text-faint: #5c6b81;
   --brand: var(--violet-600);
   --brand-strong: var(--violet-700);
   --on-brand: var(--slate-0);
