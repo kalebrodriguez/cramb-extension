@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { cardRepo } from '@/data/repositories';
+import { ToastViewport } from '@/components/ToastViewport';
+import { toast } from '@/lib/toast';
 
 function isYouTubeWatchUrl(url: string | undefined): boolean {
   if (!url) return false;
@@ -34,7 +36,7 @@ export function Popup() {
       { type: 'capture.fromVideo', payload: { url: activeTab.url } },
       (response) => {
         if (response && response.ok === false) {
-          alert(`Couldn't capture video: ${response.error?.message ?? 'unknown error'}`);
+          toast.error(`Couldn't capture video: ${response.error?.message ?? 'unknown error'}`);
         }
       },
     );
@@ -94,9 +96,11 @@ export function Popup() {
                   },
                 }, (response) => {
                    if (response && response.error) {
-                     // The error might be a structured object from our Result type
-                     const errMsg = typeof response.error === 'object' ? JSON.stringify(response.error) : response.error;
-                     alert(`Failed to capture: ${errMsg}`);
+                     const errMsg =
+                       typeof response.error === 'object'
+                         ? (response.error.message ?? 'unknown error')
+                         : response.error;
+                     toast.error(`Failed to capture: ${errMsg}`);
                    }
                 });
               }
@@ -125,6 +129,7 @@ export function Popup() {
       <footer className="text-xs text-faint text-center pt-2 border-t border-border-subtle">
         Ready to remember
       </footer>
+      <ToastViewport />
     </div>
   );
 }
