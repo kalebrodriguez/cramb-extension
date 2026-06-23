@@ -37,6 +37,15 @@ const GenerateCards = z.object({
   }),
 });
 
+const GenerateFromText = z.object({
+  type: z.literal('generate.fromText'),
+  payload: z.object({
+    text: z.string().min(1),
+    title: z.string().optional(),
+    options: GenOptionsSchema.optional(),
+  }),
+});
+
 const CardsSave = z.object({
   type: z.literal('cards.save'),
   payload: z.object({
@@ -175,6 +184,7 @@ export const MessageSchema = z.discriminatedUnion('type', [
   CaptureFromPage,
   CaptureFromVideo,
   GenerateCards,
+  GenerateFromText,
   CardsSave,
   ReviewNext,
   ReviewGrade,

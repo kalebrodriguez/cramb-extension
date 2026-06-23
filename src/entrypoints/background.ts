@@ -50,7 +50,7 @@ export default defineBackground(() => {
   // highlight and open the side panel (the menu click carries the user gesture
   // sidePanel.open() requires; the in-page pill can't).
   const SELECTION_MENU_ID = 'cramb-make-cards';
-  chrome.runtime.onInstalled.addListener(() => {
+  chrome.runtime.onInstalled.addListener((details) => {
     // removeAll first so re-installs/updates don't throw on a duplicate id.
     chrome.contextMenus.removeAll(() => {
       chrome.contextMenus.create({
@@ -59,6 +59,14 @@ export default defineBackground(() => {
         contexts: ['selection'],
       });
     });
+
+    // First install → open the onboarding wizard so a new user reaches their
+    // first card without hunting through the options page.
+    if (details.reason === 'install') {
+      chrome.tabs
+        .create({ url: chrome.runtime.getURL('/onboarding.html') })
+        .catch(() => {});
+    }
   });
 
   chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -404,6 +412,29 @@ export default defineBackground(() => {
         } catch (e) {
           const message = e instanceof Error ? e.message : 'UNKNOWN';
           // Map to RATE_LIMITED if error implies quota or rate limiting
+          if (message.toLowerCase().includes('rate limit') || message.includes('429')) {
+            return err('RATE_LIMITED', `Generation failed due to rate limits: ${message}`);
+          }
+          return err('UNKNOWN', `Generation failed: ${message}`);
+        }
+      }
+
+      case 'generate.fromText': {
+        // Onboarding's "first card" demo: generate directly from a short passage,
+        // no source persisted. Cards are shown to the user, never auto-saved
+        // (golden rule §5 — they choose to keep them when they reach the deck).
+        const provider = await getProvider();
+        if (!provider) return err('NO_MODEL_CONFIG', 'No model configured.');
+        try {
+          const { GenOptionsSchema } = await import('@/lib/messages');
+          const cards = await provider.generateCards({
+            text: msg.payload.text,
+            title: msg.payload.title,
+            options: msg.payload.options ?? GenOptionsSchema.parse({}),
+          });
+          return ok(cards);
+        } catch (e) {
+          const message = e instanceof Error ? e.message : 'UNKNOWN';
           if (message.toLowerCase().includes('rate limit') || message.includes('429')) {
             return err('RATE_LIMITED', `Generation failed due to rate limits: ${message}`);
           }

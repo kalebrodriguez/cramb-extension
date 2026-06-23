@@ -9,20 +9,7 @@ import {
   saveApiKey,
 } from '@/lib/settings';
 import { DataSection } from './DataSection';
-
-const PROVIDERS: { id: Provider; label: string }[] = [
-  { id: 'openai', label: 'OpenAI' },
-  { id: 'anthropic', label: 'Anthropic' },
-  { id: 'google', label: 'Google' },
-  { id: 'ollama', label: 'Ollama (local)' },
-];
-
-const DEFAULT_MODELS: Record<Provider, string> = {
-  openai: 'gpt-4o-mini',
-  anthropic: 'claude-sonnet-4-6',
-  google: 'gemini-2.0-flash',
-  ollama: 'llama3.2',
-};
+import { PROVIDERS, DEFAULT_MODELS } from '@/lib/providers-meta';
 
 type TestStatus = 'idle' | 'testing' | 'success' | 'error';
 
