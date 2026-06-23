@@ -4,6 +4,7 @@ import { loadApiKey } from '@/lib/settings';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
 import { providerError } from './http-error';
 import { parseModelJson } from './json';
+import { fetchWithRetry } from './fetch';
 import type { LLMProvider, GenerateInput } from './types';
 
 export class GoogleProvider implements LLMProvider {
@@ -19,7 +20,7 @@ export class GoogleProvider implements LLMProvider {
     const apiKey = await loadApiKey();
     if (!apiKey) throw new Error('NO_MODEL_CONFIG');
 
-    const response = await fetch(this.getUrl(apiKey), {
+    const response = await fetchWithRetry(this.getUrl(apiKey), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
