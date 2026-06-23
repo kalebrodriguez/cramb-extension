@@ -4,6 +4,7 @@ import { loadApiKey } from '@/lib/settings';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
 import { providerError } from './http-error';
 import { parseModelJson } from './json';
+import { fetchWithRetry } from './fetch';
 import type { LLMProvider, GenerateInput } from './types';
 
 const OPENAI_API = 'https://api.openai.com/v1/chat/completions';
@@ -17,7 +18,7 @@ export class OpenAIProvider implements LLMProvider {
     const apiKey = await loadApiKey();
     if (!apiKey) throw new Error('NO_MODEL_CONFIG');
 
-    const response = await fetch(OPENAI_API, {
+    const response = await fetchWithRetry(OPENAI_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
