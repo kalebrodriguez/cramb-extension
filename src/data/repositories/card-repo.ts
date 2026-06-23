@@ -85,6 +85,11 @@ export const cardRepo = {
     return db.cards.where('deckId').equals(deckId).toArray();
   },
 
+  /** Every card in the library (used by stats / due forecast). */
+  async getAll(): Promise<Card[]> {
+    return db.cards.toArray();
+  },
+
   /** Suspend or unsuspend a single card (suspended cards are skipped in review). */
   async setSuspended(id: string, suspended: boolean): Promise<void> {
     await db.cards.update(id, { suspended, updatedAt: Date.now() });

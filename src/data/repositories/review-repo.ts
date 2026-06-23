@@ -14,6 +14,11 @@ export const reviewRepo = {
     return db.reviews.orderBy('ts').reverse().limit(limit).toArray();
   },
 
+  /** All reviews, oldest-first (used by stats: streak + retention). */
+  async getAll(): Promise<Review[]> {
+    return db.reviews.orderBy('ts').toArray();
+  },
+
   async countToday(): Promise<number> {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
