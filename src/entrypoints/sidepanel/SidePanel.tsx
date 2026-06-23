@@ -8,6 +8,7 @@ import { create } from 'zustand';
 import { DecksView } from './components/DecksView';
 import { DeckDetail } from './components/DeckDetail';
 import { SearchView } from './components/SearchView';
+import { StatsSummary } from './components/StatsSummary';
 
 type View = 'home' | 'review' | 'decks' | 'search' | 'capture';
 
@@ -372,6 +373,7 @@ export function SidePanel() {
             ) : (
               <p className="text-muted text-sm">All caught up — nice.</p>
             )}
+            <StatsSummary />
             {decks.length > 0 && (
               <div className="w-full mt-6">
                 <h3 className="text-sm font-medium text-muted mb-2">Your decks</h3>
