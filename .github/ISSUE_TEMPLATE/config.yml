@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security or privacy report
+    url: https://github.com/kalebrodriguez/cramb-extension/security/advisories/new
+    about: Please report vulnerabilities privately — do not open a public issue.
+  - name: Question or idea (Discussions)
+    url: https://github.com/kalebrodriguez/cramb-extension/discussions
+    about: For open-ended questions and discussion.

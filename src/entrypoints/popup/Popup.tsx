@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { cardRepo } from '@/data/repositories';
 import { ToastViewport } from '@/components/ToastViewport';
 import { toast } from '@/lib/toast';
+import { openWorkspace } from '@/lib/side-panel';
 
 function isYouTubeWatchUrl(url: string | undefined): boolean {
   if (!url) return false;
@@ -45,8 +46,12 @@ export function Popup() {
 
   async function openSidePanel() {
     const win = await chrome.windows.getCurrent();
-    if (win.id !== undefined) {
-      await chrome.sidePanel.open({ windowId: win.id });
+    const opened = await openWorkspace(win.id !== undefined ? { windowId: win.id } : {});
+    // If neither a side panel (Chromium) nor a sidebar (Firefox) is available,
+    // fall back to opening the workspace as a normal extension tab so the user
+    // is never stranded.
+    if (!opened) {
+      await chrome.tabs.create({ url: chrome.runtime.getURL('/sidepanel.html') });
     }
   }
 

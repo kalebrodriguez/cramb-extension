@@ -88,7 +88,7 @@ docs/           the 6 product/eng docs
 ---
 
 ## 7. Current status (UPDATE EACH SESSION)
-- **Phase:** M4 complete — interop & insight (Anki `.apkg` + JSON backup + stats). AnkiConnect deferred.
+- **Phase:** M5 in progress — launch hardening. M0–M4 complete; M5 onboarding, toasts, theme (dark/light/system), and the automated a11y (axe) gate have landed. Now closing docs/repo-hygiene and cross-browser gaps for a believable v1.
 - **What's done:** 
   - WXT + React + Tailwind v4 scaffold; Dexie DB + repository layer.
   - Zod schemas for all entities + messages + LLM output.
@@ -104,7 +104,10 @@ docs/           the 6 product/eng docs
   - Interop: JSON library export/import (Options "Your data") and Anki `.apkg` export (per-deck ⤓ Anki button; `sql.js` + `fflate`, wasm in the bundle).
   - Insight: Home stats summary (streak, retention, 7-day due forecast) from `lib/stats.ts`.
   - Selection capture via the right-click "Make cards from selection" context menu (the in-page pill couldn't open a closed side panel).
-- **Next action:** Milestone 5 — Polish & public launch. Onboarding wizard done; remaining: a11y pass (axe), empty states/skeletons/toasts (replace `alert()`s), theme/responsive (light + 320px), hardening (backoff/quota/error taxonomy), Firefox build test, store assets + submission, OSS on-ramp (good-first-issues, adapter guide, SECURITY.md).
+  - M5: onboarding wizard (`src/entrypoints/onboarding/`), non-blocking toasts (`lib/toast.ts` + `ToastViewport`), theme system (`lib/theme.ts`, dark/light/system), automated axe a11y gate (Playwright e2e over all surfaces, WCAG 2.1 AA, in CI).
+  - Repo hygiene: `SECURITY.md`, `CHANGELOG.md`, issue/PR templates; README reconciled with shipped features.
+  - Cross-browser: `lib/side-panel.ts` `openWorkspace()` feature-detects `chrome.sidePanel` (Chromium) vs `sidebarAction` (Firefox), with a tab fallback — no more Firefox `TypeError` on panel open.
+- **Next action:** finish M5 launch hardening — provider retry/backoff on 429/5xx (+tests); in-repo store-readiness docs (permission justifications, release checklist); then store submission. Deferred past v1: backend/accounts, sync, AnkiConnect.
 - **Last updated:** 2026-06-23.
 
 ### Changelog of context

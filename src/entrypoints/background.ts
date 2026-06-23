@@ -2,6 +2,7 @@ import { defineBackground } from 'wxt/utils/define-background';
 import { MessageSchema } from '@/lib/messages';
 import { ok, err, type Result } from '@/lib/errors';
 import { getProvider } from '@/background/providers';
+import { openWorkspace } from '@/lib/side-panel';
 
 /** SHA-256 hex digest of a string, used to de-duplicate captured content. */
 async function sha256Hex(text: string): Promise<string> {
@@ -73,8 +74,8 @@ export default defineBackground(() => {
     if (info.menuItemId !== SELECTION_MENU_ID || !info.selectionText || tab?.id === undefined) {
       return;
     }
-    // Open the panel first, synchronously within the gesture.
-    chrome.sidePanel.open({ tabId: tab.id }).catch(() => {});
+    // Open the panel first, synchronously within the gesture (cross-browser).
+    void openWorkspace({ tabId: tab.id });
     void captureSelection(info.selectionText, tab.url ?? info.pageUrl ?? '', tab.title ?? '');
   });
 
