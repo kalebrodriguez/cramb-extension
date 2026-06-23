@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Cramb</title>
+  <meta name="description" content="Cramb's privacy policy. Cramb is local-first and private: your reading, cards, and API key stay on your device. No accounts, no tracking, no backend." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0 L14.4 9.6 L24 12 L14.4 14.4 L12 24 L9.6 14.4 L0 12 L9.6 9.6 Z' fill='%238C7DF7'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #0B1120; --surface: #161F33; --border: #2A3852; --border-subtle: #1a2336;
+      --text: #F8FAFC; --muted: #9FB0C7; --faint: #64748B; --brand: #8C7DF7; --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
+      line-height: 1.7; -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+    header.site { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; max-width: 760px; margin: 0 auto; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--brand); }
+    .logo svg { width: 18px; height: 18px; }
+    h1 { font-size: 2rem; margin: 40px 0 4px; letter-spacing: -0.02em; }
+    .updated { color: var(--faint); font-size: 0.9rem; margin-bottom: 28px; }
+    h2 { font-size: 1.2rem; margin: 36px 0 10px; }
+    p, li { color: #d7e0ee; }
+    .muted { color: var(--muted); }
+    section.tldr {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px 22px; margin: 8px 0 8px;
+    }
+    section.tldr ul { margin: 8px 0 0; padding-left: 20px; }
+    section.tldr li { margin: 6px 0; }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: #0c1426; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 1px 5px; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    footer.site { text-align: center; color: var(--faint); font-size: 0.85rem; padding: 48px 24px 64px; border-top: 1px solid var(--border-subtle); margin-top: 48px; }
+    footer.site a { color: var(--muted); margin: 0 9px; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <a class="logo" href="./index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L14.4 9.6 L24 12 L14.4 14.4 L12 24 L9.6 14.4 L0 12 L9.6 9.6 Z" fill="#8C7DF7"/></svg>
+      Cramb
+    </a>
+    <a href="./index.html" class="muted">← Home</a>
+  </header>
+
+  <main class="wrap">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: June 23, 2026</p>
+
+    <section class="tldr">
+      <strong>The short version.</strong>
+      <ul>
+        <li>Cramb has <strong>no backend and no accounts</strong>. There is no Cramb server to send your data to.</li>
+        <li>Your decks, cards, captured content, and review history live <strong>only on your device</strong>.</li>
+        <li>Your API key is stored locally and used <strong>only</strong> to talk to the AI provider <em>you</em> choose.</li>
+        <li><strong>No analytics, no tracking, no telemetry.</strong> Cramb never "phones home."</li>
+      </ul>
+    </section>
+
+    <h2>1. Who this applies to</h2>
+    <p>This policy covers the <strong>Cramb browser extension</strong> ("Cramb", "the extension"). Cramb is open-source software you run in your own browser. It is not a hosted service, and its developers do not operate any server that receives your data.</p>
+
+    <h2>2. What Cramb stores, and where</h2>
+    <p>Everything Cramb creates stays on your device:</p>
+    <table>
+      <thead><tr><th>Data</th><th>Where it's stored</th></tr></thead>
+      <tbody>
+        <tr><td>Decks, cards, captured sources, and review history</td><td>Your browser's local database (IndexedDB)</td></tr>
+        <tr><td>Settings (chosen provider, model, Ollama endpoint)</td><td><code>chrome.storage.local</code> on your device</td></tr>
+        <tr><td>Your AI provider API key</td><td><code>chrome.storage.local</code> on your device</td></tr>
+      </tbody>
+    </table>
+    <p>None of this is transmitted to the developers of Cramb. It is never uploaded to a Cramb server, because there isn't one.</p>
+
+    <h2>3. Your API key</h2>
+    <p>You bring your own API key. Cramb <strong>never ships, bundles, or shares a key</strong>. Your key is:</p>
+    <ul>
+      <li>stored only in <code>chrome.storage.local</code> on your device;</li>
+      <li>read only by the extension's background service worker, solely to authenticate requests to the provider you selected;</li>
+      <li>never sent to a content script or web page, never logged, and <strong>never included in any export</strong>.</li>
+    </ul>
+
+    <h2>4. Content sent to AI providers</h2>
+    <p>When you ask Cramb to generate flashcards, the relevant text — your highlighted selection, an article's extracted text, or a video transcript — together with the generation prompt is sent <strong>directly from your browser to the one AI provider you configured</strong>, and to no one else:</p>
+    <ul>
+      <li><a href="https://openai.com/policies/privacy-policy/" target="_blank" rel="noopener noreferrer">OpenAI</a>, <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">Anthropic</a>, or <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google</a> — if you use one of their APIs with your key; or</li>
+      <li><strong>nowhere off your machine</strong>, if you use a local <a href="https://ollama.com" target="_blank" rel="noopener noreferrer">Ollama</a> model (requests go to <code>localhost</code>).</li>
+    </ul>
+    <p>That content is handled under <em>your chosen provider's</em> privacy policy and your account's settings with them. Cramb does not see, intercept, or retain it. If privacy is paramount, use Ollama for fully local generation.</p>
+
+    <h2>5. Capturing pages and videos</h2>
+    <p>Cramb only reads a page's content when you explicitly capture it (via the toolbar button or the right-click "Make cards from selection" menu). To capture a YouTube video's transcript, Cramb requests it from <code>youtube.com</code>. Cramb does not run in the background collecting your browsing history, and it does not track the pages you visit.</p>
+
+    <h2>6. No tracking or analytics</h2>
+    <p>Cramb contains <strong>no analytics, no telemetry, no advertising, and no third-party trackers</strong>. It makes network requests only to: (a) the AI provider you configured, and (b) <code>youtube.com</code> when you capture a video. It does not "phone home" to any Cramb-operated endpoint, because none exists.</p>
+
+    <h2>7. Permissions and why they're needed</h2>
+    <table>
+      <thead><tr><th>Permission</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><code>activeTab</code> / <code>scripting</code></td><td>Read the current page's content when you choose to capture it.</td></tr>
+        <tr><td><code>storage</code></td><td>Save your settings and API key locally on your device.</td></tr>
+        <tr><td><code>sidePanel</code></td><td>Show the Cramb workspace (cards, review, decks) in the browser side panel.</td></tr>
+        <tr><td><code>contextMenus</code></td><td>Provide the right-click "Make cards from selection" option.</td></tr>
+        <tr><td>Host access to provider APIs &amp; <code>youtube.com</code></td><td>Send generation requests to your chosen AI provider and fetch video transcripts.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>8. Exports</h2>
+    <p>Cramb can export your library as a JSON backup or an Anki <code>.apkg</code> file. These files are generated locally and saved by you, to wherever you choose. <strong>Exports never contain your API key.</strong> Once a file leaves Cramb, it's under your control.</p>
+
+    <h2>9. Data retention and deletion</h2>
+    <p>Because all data is local, you are in control of it. You can delete decks and cards inside the extension, or remove everything by clearing the extension's storage or uninstalling Cramb. There is no server-side copy for us to delete, and nothing persists once you remove it from your device.</p>
+
+    <h2>10. Children's privacy</h2>
+    <p>Cramb is a general-purpose study tool and is not directed at children under 13. It collects no personal information and operates entirely on the user's device.</p>
+
+    <h2>11. Changes to this policy</h2>
+    <p>If this policy changes, the "Last updated" date above will change and the revision history is available in the project's public Git repository. Material changes will be noted in the release notes.</p>
+
+    <h2>12. Contact</h2>
+    <p>Questions or concerns? Please open an issue on the <a href="https://github.com/kalebrodriguez/cramb-extension/issues" target="_blank" rel="noopener noreferrer">Cramb GitHub repository</a>.</p>
+  </main>
+
+  <footer class="site">
+    <div>
+      <a href="./index.html">Home</a>
+      <a href="https://github.com/kalebrodriguez/cramb-extension">GitHub</a>
+      <a href="https://github.com/kalebrodriguez/cramb-extension/blob/main/LICENSE">MIT License</a>
+    </div>
+    <p style="margin-top:12px">✦ Cramb — remember what you read.</p>
+  </footer>
+</body>
+</html>
