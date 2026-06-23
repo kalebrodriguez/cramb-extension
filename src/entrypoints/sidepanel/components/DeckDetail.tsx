@@ -238,7 +238,7 @@ export function DeckDetail({ deck, onBack, onChanged }: DeckDetailProps) {
                     <button
                       disabled={busy}
                       onClick={() => remove(card.id)}
-                      className="text-red-400 hover:text-red-300 disabled:opacity-40"
+                      className="text-danger hover:opacity-80 disabled:opacity-40"
                     >
                       Delete
                     </button>
