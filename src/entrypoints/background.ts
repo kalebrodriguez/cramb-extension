@@ -11,10 +11,63 @@ async function sha256Hex(text: string): Promise<string> {
     .join('');
 }
 
+/**
+ * Persist a highlighted-text selection as a source, ensure a deck exists, and
+ * notify the side panel. Shared by the in-page "Make cards" pill
+ * (`capture.fromSelection`) and the right-click context menu.
+ */
+async function captureSelection(text: string, url: string, title: string) {
+  const { sourceRepo, deckRepo } = await import('@/data/repositories');
+  const sourceName = title || new URL(url).hostname || 'Unknown Source';
+  const contentHash = await sha256Hex(text);
+
+  const source = await sourceRepo.create({
+    type: 'selection',
+    url,
+    title: sourceName + ' (Selection)',
+    rawText: text,
+    excerpt: text.substring(0, 150) + '...',
+    contentHash,
+  });
+
+  const existingDecks = await deckRepo.listAll();
+  if (!existingDecks.find((d) => d.name === sourceName)) {
+    await deckRepo.create({ name: sourceName, sourceId: source.id });
+  }
+
+  await chrome.storage.local.set({ activeCaptureSourceId: source.id });
+  chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
+  return source;
+}
+
 export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
     handleMessage(raw, sender).then(sendResponse);
     return true;
+  });
+
+  // Right-click "Make cards from selection" — the reliable way to capture a
+  // highlight and open the side panel (the menu click carries the user gesture
+  // sidePanel.open() requires; the in-page pill can't).
+  const SELECTION_MENU_ID = 'cramb-make-cards';
+  chrome.runtime.onInstalled.addListener(() => {
+    // removeAll first so re-installs/updates don't throw on a duplicate id.
+    chrome.contextMenus.removeAll(() => {
+      chrome.contextMenus.create({
+        id: SELECTION_MENU_ID,
+        title: 'Make cards from selection',
+        contexts: ['selection'],
+      });
+    });
+  });
+
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId !== SELECTION_MENU_ID || !info.selectionText || tab?.id === undefined) {
+      return;
+    }
+    // Open the panel first, synchronously within the gesture.
+    chrome.sidePanel.open({ tabId: tab.id }).catch(() => {});
+    void captureSelection(info.selectionText, tab.url ?? info.pageUrl ?? '', tab.title ?? '');
   });
 
   async function handleMessage(raw: unknown, sender: chrome.runtime.MessageSender): Promise<Result<unknown>> {
@@ -95,35 +148,18 @@ export default defineBackground(() => {
       }
 
       case 'capture.fromSelection': {
-        const { sourceRepo, deckRepo } = await import('@/data/repositories');
-        
-        const sourceName = msg.payload.title || new URL(msg.payload.url).hostname || 'Unknown Source';
-        
-        // Hash the content
-        const contentHash = await sha256Hex(msg.payload.text);
-
-        const source = await sourceRepo.create({
-            type: 'selection',
-            url: msg.payload.url,
-            title: sourceName + ' (Selection)',
-            rawText: msg.payload.text,
-            excerpt: msg.payload.text.substring(0, 150) + '...',
-            contentHash
-        });
-
-        // Ensure a deck exists for this source
-        const existingDecks = await deckRepo.listAll();
-        const deckId = existingDecks.find(d => d.name === sourceName)?.id;
-        
-        if (!deckId) {
-            await deckRepo.create({ name: sourceName, sourceId: source.id });
+        // Note: this path can't open a closed side panel — sidePanel.open() only
+        // works from a real user gesture (action/contextMenu/command), not from a
+        // message forwarded by a content script. When the panel is already open,
+        // the CAPTURE_COMPLETE broadcast switches it to the capture view; when
+        // it's closed, the right-click "Make cards from selection" menu (which
+        // does open it) is the reliable entry point.
+        try {
+          const source = await captureSelection(msg.payload.text, msg.payload.url, msg.payload.title);
+          return ok(source);
+        } catch (e) {
+          return err('UNKNOWN', `Capture failed: ${String(e)}`);
         }
-        
-        // Let the side panel know that capture is complete
-        await chrome.storage.local.set({ activeCaptureSourceId: source.id });
-        chrome.runtime.sendMessage({ type: 'CAPTURE_COMPLETE', sourceId: source.id }).catch(() => {});
-
-        return ok(source);
       }
 
       case 'capture.fromVideo': {
