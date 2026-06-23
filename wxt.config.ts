@@ -7,6 +7,16 @@ export default defineConfig({
     name: 'Cramb — Remember What You Read',
     description:
       'Turn articles and videos into spaced-repetition flashcards. Privacy-first, local-first, Anki-compatible.',
+    icons: {
+      16: 'icon/16.png',
+      32: 'icon/32.png',
+      48: 'icon/48.png',
+      128: 'icon/128.png',
+    },
+    action: {
+      default_title: 'Cramb',
+      default_icon: { 16: 'icon/16.png', 32: 'icon/32.png' },
+    },
     permissions: ['activeTab', 'scripting', 'storage', 'sidePanel', 'contextMenus'],
     // Anki export compiles the sql.js WebAssembly module in the side-panel page;
     // MV3 requires 'wasm-unsafe-eval' to allow WebAssembly. Still no remote code
