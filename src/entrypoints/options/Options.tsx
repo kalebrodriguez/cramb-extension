@@ -8,6 +8,7 @@ import {
   loadApiKey,
   saveApiKey,
 } from '@/lib/settings';
+import { DataSection } from './DataSection';
 
 const PROVIDERS: { id: Provider; label: string }[] = [
   { id: 'openai', label: 'OpenAI' },
@@ -179,6 +180,8 @@ export function Options() {
           the provider you choose and nowhere else.
         </p>
       </section>
+
+      <DataSection />
     </div>
   );
 }
