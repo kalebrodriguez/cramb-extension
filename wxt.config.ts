@@ -7,7 +7,7 @@ export default defineConfig({
     name: 'Cramb — Remember What You Read',
     description:
       'Turn articles and videos into spaced-repetition flashcards. Privacy-first, local-first, Anki-compatible.',
-    permissions: ['activeTab', 'scripting', 'storage', 'sidePanel'],
+    permissions: ['activeTab', 'scripting', 'storage', 'sidePanel', 'contextMenus'],
     optional_host_permissions: ['<all_urls>'],
     host_permissions: [
       'https://api.openai.com/*',
