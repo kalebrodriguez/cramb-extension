@@ -8,8 +8,8 @@ the broader launch plan and `permissions-justifications.md` for store copy.
 - [ ] `main` is green: `pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm build:firefox`
 - [ ] `pnpm test:e2e` (axe a11y gate) passes on the built extension
 - [ ] `pnpm audit` reviewed — no unaddressed runtime (shipped) vulnerabilities
-- [ ] Manual smoke on Chrome + one Chromium variant (Edge/Brave) + Firefox:
-      capture page → edit → save → review → grade → Anki export
+- [ ] **Manual smoke test** on Chrome + one Chromium variant (Edge/Brave) +
+      Firefox — full click-by-click pass in `manual-smoke-test.md`
 - [ ] Real provider smoke: OpenAI / Anthropic / Google / Ollama each generate once
 - [ ] Error paths: no key, invalid key, rate-limited, no transcript, empty page
 
