@@ -10,8 +10,15 @@ import {
 } from '@/lib/settings';
 import { DataSection } from './DataSection';
 import { PROVIDERS, DEFAULT_MODELS } from '@/lib/providers-meta';
+import { applyTheme, type ThemePref } from '@/lib/theme';
 
 type TestStatus = 'idle' | 'testing' | 'success' | 'error';
+
+const THEMES: { id: ThemePref; label: string }[] = [
+  { id: 'dark', label: 'Dark' },
+  { id: 'light', label: 'Light' },
+  { id: 'system', label: 'System' },
+];
 
 export function Options() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -64,6 +71,13 @@ export function Options() {
       setTestStatus('error');
       setTestDetail(result?.error?.message ?? 'Connection failed.');
     }
+  }
+
+  async function handleThemeChange(theme: ThemePref) {
+    const updated = { ...settings, appearance: { ...settings.appearance, theme } };
+    setSettings(updated);
+    applyTheme(theme); // live preview
+    await saveSettings(updated); // persist immediately, no Save needed
   }
 
   const isOllama = settings.provider === 'ollama';
@@ -166,6 +180,39 @@ export function Options() {
           Your key and reading stay on this device. Cramb talks directly to
           the provider you choose and nowhere else.
         </p>
+      </section>
+
+      <section className="space-y-4 mt-10">
+        <h2 className="text-md font-semibold text-brand">Appearance</h2>
+        <div>
+          <label className="block text-sm font-medium mb-1" id="theme-label">
+            Theme
+          </label>
+          <div className="flex gap-2" role="group" aria-labelledby="theme-label">
+            {THEMES.map((t) => {
+              const active = settings.appearance.theme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => handleThemeChange(t.id)}
+                  className={
+                    'px-4 py-2 rounded-md text-sm border transition-colors duration-fast ' +
+                    (active
+                      ? 'bg-brand-strong text-on-brand border-transparent'
+                      : 'bg-surface border-border text-text hover:bg-elevated')
+                  }
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-faint mt-2">
+            “System” follows your operating system’s light/dark setting.
+          </p>
+        </div>
       </section>
 
       <DataSection />

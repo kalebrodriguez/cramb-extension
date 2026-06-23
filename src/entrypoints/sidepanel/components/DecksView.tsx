@@ -183,7 +183,7 @@ export function DecksView({ onOpenDeck, onChanged }: DecksViewProps) {
                   <button
                     disabled={busy}
                     onClick={() => remove(deck.id, deck.name, cardCount)}
-                    className="px-2 py-1 border border-border rounded text-red-400 hover:bg-elevated transition-colors disabled:opacity-40"
+                    className="px-2 py-1 border border-border rounded text-danger hover:bg-elevated transition-colors disabled:opacity-40"
                   >
                     Delete
                   </button>

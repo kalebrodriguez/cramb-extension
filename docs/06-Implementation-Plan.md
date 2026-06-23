@@ -85,7 +85,7 @@
 
 - [x] Onboarding wizard (provider/key/Ollama, validation, first-card demo). *(4-step `src/entrypoints/onboarding/`: welcome → connect+test → live first-card demo via `generate.fromText` → capture tips; opens on first install via `onInstalled`.)*
 - [ ] Empty states, skeleton loaders, toasts, full a11y pass (keyboard, SR, contrast, reduced-motion).
-- [ ] Theme polish (dark default + light); responsive at 320px.
+- [x] Theme polish (dark default + light); responsive at 320px. *(`lib/theme.ts` applies the persisted `appearance.theme` (dark/light/system) on every entrypoint, follows OS + live-updates on settings change; Options theme switcher; raw palette colors tokenized so light renders correctly. Side panel already wraps at 320px.)*
 - [ ] Hardening: backoff, quota-pressure handling, storage-persist request, error taxonomy complete.
 - [ ] Store assets: icons, screenshots, listing copy, **privacy policy**, permissions justifications.
 - [ ] Submit to **Chrome Web Store** + **Firefox AMO**.

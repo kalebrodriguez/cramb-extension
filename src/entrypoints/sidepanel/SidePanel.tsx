@@ -178,22 +178,22 @@ function ReviewEngine({ onComplete }: { onComplete: () => void }) {
       ) : (
          <div className="w-full grid grid-cols-4 gap-2 mb-4">
            <button onClick={() => handleGrade(1)} className="flex flex-col items-center py-2 bg-surface hover:bg-elevated border border-border rounded-md transition-colors">
-              <span className="text-red-400 font-medium text-sm">Again</span>
+              <span className="text-rating-again font-medium text-sm">Again</span>
               {intervals && <span className="text-xs text-muted mt-1">{formatInterval(intervals[1])}</span>}
               <span className="text-[10px] text-faint mt-1 border border-border-subtle rounded px-1">1</span>
            </button>
            <button onClick={() => handleGrade(2)} className="flex flex-col items-center py-2 bg-surface hover:bg-elevated border border-border rounded-md transition-colors">
-              <span className="text-orange-400 font-medium text-sm">Hard</span>
+              <span className="text-rating-hard font-medium text-sm">Hard</span>
               {intervals && <span className="text-xs text-muted mt-1">{formatInterval(intervals[2])}</span>}
               <span className="text-[10px] text-faint mt-1 border border-border-subtle rounded px-1">2</span>
            </button>
            <button onClick={() => handleGrade(3)} className="flex flex-col items-center py-2 bg-surface hover:bg-elevated border border-border rounded-md transition-colors">
-              <span className="text-green-400 font-medium text-sm">Good</span>
+              <span className="text-rating-good font-medium text-sm">Good</span>
               {intervals && <span className="text-xs text-muted mt-1">{formatInterval(intervals[3])}</span>}
               <span className="text-[10px] text-faint mt-1 border border-border-subtle rounded px-1">3 / Sp</span>
            </button>
            <button onClick={() => handleGrade(4)} className="flex flex-col items-center py-2 bg-surface hover:bg-elevated border border-border rounded-md transition-colors">
-              <span className="text-blue-400 font-medium text-sm">Easy</span>
+              <span className="text-rating-easy font-medium text-sm">Easy</span>
               {intervals && <span className="text-xs text-muted mt-1">{formatInterval(intervals[4])}</span>}
               <span className="text-[10px] text-faint mt-1 border border-border-subtle rounded px-1">4</span>
            </button>
@@ -449,7 +449,7 @@ export function SidePanel() {
                  <div className="space-y-3">
                    {generatedCards.map((card, idx) => (
                      <div key={idx} className="p-3 border border-border rounded-md bg-surface text-sm flex flex-col gap-2 relative group">
-                       <button onClick={() => removeGeneratedCard(idx)} className="absolute top-2 right-2 text-muted hover:text-red-400">✕</button>
+                       <button onClick={() => removeGeneratedCard(idx)} aria-label="Remove card" className="absolute top-2 right-2 text-muted hover:text-danger">✕</button>
                        <div>
                          <span className="text-xs font-semibold text-brand mb-1 block uppercase">{card.type}</span>
                          <textarea 

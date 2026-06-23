@@ -26,7 +26,7 @@ export const SettingsSchema = z.object({
 
 export type Settings = z.infer<typeof SettingsSchema>;
 
-const SETTINGS_KEY = 'cramb.settings';
+export const SETTINGS_KEY = 'cramb.settings';
 const SECRET_KEY = 'cramb.secret.apiKey';
 
 export async function loadSettings(): Promise<Settings | null> {
