@@ -83,7 +83,7 @@
 
 **Goal:** ship to stores and open the doors to contributors.
 
-- [ ] Onboarding wizard (provider/key/Ollama, validation, first-card demo).
+- [x] Onboarding wizard (provider/key/Ollama, validation, first-card demo). *(4-step `src/entrypoints/onboarding/`: welcome → connect+test → live first-card demo via `generate.fromText` → capture tips; opens on first install via `onInstalled`.)*
 - [ ] Empty states, skeleton loaders, toasts, full a11y pass (keyboard, SR, contrast, reduced-motion).
 - [ ] Theme polish (dark default + light); responsive at 320px.
 - [ ] Hardening: backoff, quota-pressure handling, storage-persist request, error taxonomy complete.
