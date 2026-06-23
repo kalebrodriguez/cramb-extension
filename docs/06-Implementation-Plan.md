@@ -71,9 +71,9 @@
 
 **Goal:** no lock-in + light motivation.
 
-- [ ] Anki `.apkg` export (basic + cloze mapping); JSON export/import.
-- [ ] Optional AnkiConnect path (detected, not required).
-- [ ] Stats: streak, due forecast, retention estimate (incremental aggregation).
+- [x] Anki `.apkg` export (basic + cloze mapping); JSON export/import. *(sql.js + fflate; per-deck ⤓ Anki button; cards export as new. JSON backup in Options.)*
+- [ ] Optional AnkiConnect path (detected, not required). *(deferred — `.apkg` export covers the interop need for now)*
+- [x] Stats: streak, due forecast, retention estimate (incremental aggregation). *(Home summary; pure `lib/stats.ts`)*
 
 **Exit criteria:** A deck round-trips to Anki and imports cleanly; JSON backup restores full library; stats render from real review data.
 

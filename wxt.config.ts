@@ -8,6 +8,12 @@ export default defineConfig({
     description:
       'Turn articles and videos into spaced-repetition flashcards. Privacy-first, local-first, Anki-compatible.',
     permissions: ['activeTab', 'scripting', 'storage', 'sidePanel', 'contextMenus'],
+    // Anki export compiles the sql.js WebAssembly module in the side-panel page;
+    // MV3 requires 'wasm-unsafe-eval' to allow WebAssembly. Still no remote code
+    // (golden rule §4) — the wasm ships in the bundle and loads same-origin.
+    content_security_policy: {
+      extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+    },
     optional_host_permissions: ['<all_urls>'],
     host_permissions: [
       'https://api.openai.com/*',

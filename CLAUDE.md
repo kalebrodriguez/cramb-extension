@@ -88,7 +88,7 @@ docs/           the 6 product/eng docs
 ---
 
 ## 7. Current status (UPDATE EACH SESSION)
-- **Phase:** M3 complete — sources & management, including the management UI.
+- **Phase:** M4 complete — interop & insight (Anki `.apkg` + JSON backup + stats). AnkiConnect deferred.
 - **What's done:** 
   - WXT + React + Tailwind v4 scaffold; Dexie DB + repository layer.
   - Zod schemas for all entities + messages + LLM output.
@@ -101,8 +101,11 @@ docs/           the 6 product/eng docs
   - Keyboard-first, highly responsive Flashcard Review UI built into the Side Panel (`Space`, `1-4`).
   - Grading persistence back into Dexie (`cards`, `reviews` tables).
   - Side-panel management UI: Decks tab (rename/merge/delete/suspend), per-deck detail with manual card create/edit/suspend/delete, and a Search tab over cards + sources.
-- **Next action:** Milestone 4 — Interop & insight. Anki `.apkg` export (+ JSON export/import), optional AnkiConnect, and stats (streak, due forecast, retention estimate).
-- **Last updated:** 2026-06-22.
+  - Interop: JSON library export/import (Options "Your data") and Anki `.apkg` export (per-deck ⤓ Anki button; `sql.js` + `fflate`, wasm in the bundle).
+  - Insight: Home stats summary (streak, retention, 7-day due forecast) from `lib/stats.ts`.
+  - Selection capture via the right-click "Make cards from selection" context menu (the in-page pill couldn't open a closed side panel).
+- **Next action:** Milestone 5 — Polish & public launch. Onboarding wizard, a11y pass, theme/responsive polish, store assets + **privacy policy**, then submit to Chrome Web Store + Firefox AMO.
+- **Last updated:** 2026-06-23.
 
 ### Changelog of context
 - 2026-06-20 — Initial product + engineering docs written; stack and architecture chosen.
@@ -112,6 +115,7 @@ docs/           the 6 product/eng docs
 - 2026-06-20 — M3 logic: YouTube transcript adapter (`src/background/sources/youtube.ts`, `capture.fromVideo`, youtube.com host perm, transcript segments on `Source`); deck management (`merge`/`deleteWithCards`) + card suspend; manual card + deck/card edit messages; `searchRepo` full-text search (`search.query`); MCQ generation (prompt + Zod refinement). Popup gains a YouTube "Capture this video" button. 41 tests pass; typecheck/lint/build clean. Management UI still TODO.
 - 2026-06-20 — Generation hardening: fixed stale Anthropic model default (`claude-sonnet-4-6`), surfaced real provider HTTP errors (`http-error.ts`), tolerate markdown-fenced model JSON (`json.ts`, `parseModelJson`), and fixed the side panel reading `result.value` instead of `result.data`. Verified capture→generate→render end-to-end.
 - 2026-06-22 — M3 management UI built in the Side Panel: `DecksView` (counts + rename/suspend/merge/delete), `DeckDetail` (manual card create + per-card edit/suspend/delete), `SearchView` (cards + sources). Added `src/lib/messaging.ts` typed `send<T>()`. Verified working in-browser. 46 tests pass; typecheck/lint/build clean.
+- 2026-06-23 — M4 interop & insight. JSON export/import (`data/backup.ts`, `library.export/import`, Options "Your data"). Stats (`lib/stats.ts` + Home `StatsSummary`). Anki `.apkg` export (`lib/anki/*`: genanki-derived schema/models, `sql.js`+`fflate`, `'wasm-unsafe-eval'` CSP, per-deck ⤓ Anki button) — verified importing into Anki desktop. Selection-capture moved to a right-click context menu (the in-page pill can't open a closed side panel). New deps pinned (`sql.js@1.14.1`, `fflate@0.8.3`); `pnpm audit` clean for them. M4 done; AnkiConnect deferred.
 
 ---
 
