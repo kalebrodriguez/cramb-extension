@@ -3,6 +3,7 @@ import { cardRepo } from '@/data/repositories';
 import type { Card, Deck } from '@/data/schemas';
 import { send } from '@/lib/messaging';
 import { downloadApkg } from '@/lib/anki/export';
+import { toast } from '@/lib/toast';
 
 interface DeckDetailProps {
   deck: Deck;
@@ -105,8 +106,9 @@ export function DeckDetail({ deck, onBack, onChanged }: DeckDetailProps) {
             setBusy(true);
             try {
               await downloadApkg([deck], cards, deck.name);
+              toast.success(`Exported “${deck.name}” to Anki.`);
             } catch (e) {
-              alert(`Anki export failed: ${e instanceof Error ? e.message : String(e)}`);
+              toast.error(`Anki export failed: ${e instanceof Error ? e.message : String(e)}`);
             } finally {
               setBusy(false);
             }

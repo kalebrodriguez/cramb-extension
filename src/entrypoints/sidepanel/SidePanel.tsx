@@ -9,6 +9,8 @@ import { DecksView } from './components/DecksView';
 import { DeckDetail } from './components/DeckDetail';
 import { SearchView } from './components/SearchView';
 import { StatsSummary } from './components/StatsSummary';
+import { ToastViewport } from '@/components/ToastViewport';
+import { toast } from '@/lib/toast';
 
 type View = 'home' | 'review' | 'decks' | 'search' | 'capture';
 
@@ -284,17 +286,17 @@ export function SidePanel() {
       } else {
         // Better error handling surfacing
         if (result.error?.code === 'NO_MODEL_CONFIG') {
-          alert('No AI model configured. Please go to Options (⚙) to set up your API key.');
+          toast.error('No AI model configured. Open Options (⚙) to set up your API key.');
         } else if (result.error?.code === 'INVALID_KEY') {
-          alert('Invalid API Key. Please check your settings in Options.');
+          toast.error('Invalid API key. Check your settings in Options.');
         } else if (result.error?.code === 'RATE_LIMITED') {
-          alert('Rate limited by the AI provider. Please try again later.');
+          toast.error('Rate limited by the AI provider. Please try again later.');
         } else {
-          alert(result.error?.message || 'Failed to generate cards.');
+          toast.error(result.error?.message || 'Failed to generate cards.');
         }
       }
     } catch (e) {
-      alert('Generation error: ' + String(e));
+      toast.error('Generation error: ' + String(e));
     } finally {
       setIsGenerating(false);
     }
@@ -326,14 +328,16 @@ export function SidePanel() {
 
       // Clear state and go home
       await chrome.storage.local.remove('activeCaptureSourceId');
+      const saved = generatedCards.length;
       clear();
       setView('home');
-      
+      toast.success(`Saved ${saved} card${saved === 1 ? '' : 's'} to “${activeSource.title}”.`);
+
       // Refresh count
       cardRepo.getDueCount().then(setDueCount);
       deckRepo.listAll().then(setDecks);
     } catch (e) {
-      alert('Save failed: ' + String(e));
+      toast.error('Save failed: ' + String(e));
     }
   };
 
@@ -470,6 +474,7 @@ export function SidePanel() {
            </div>
         )}
       </main>
+      <ToastViewport />
     </div>
   );
 }
