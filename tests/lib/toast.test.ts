@@ -25,7 +25,7 @@ describe('toast store', () => {
     useToastStore.getState().dismiss(drop);
     const { toasts } = useToastStore.getState();
     expect(toasts).toHaveLength(1);
-    expect(toasts[0].id).toBe(keep);
+    expect(toasts[0]?.id).toBe(keep);
   });
 
   it('dismissing an unknown id is a no-op', () => {
