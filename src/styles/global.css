@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-input: var(--bg-input);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-rating-again: var(--rating-again);
+  --color-rating-hard: var(--rating-hard);
+  --color-rating-good: var(--rating-good);
+  --color-rating-easy: var(--rating-easy);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.45);
+
+  --transition-timing-function-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-duration-fast: 120ms;
+  --transition-duration-base: 200ms;
+  --transition-duration-slow: 320ms;
+
+  --z-index-toolbar: 2147483000;
+  --z-index-toast: 60;
+  --z-index-modal: 50;
+  --z-index-popover: 40;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes cramb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .toast-enter {
+    animation: cramb-toast-in var(--transition-duration-base) var(--transition-timing-function-out);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toast-enter {
+      animation: none;
+    }
+  }
+}
