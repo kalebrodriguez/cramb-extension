@@ -17,7 +17,7 @@ export default defineConfig({
       default_title: 'Cramb',
       default_icon: { 16: 'icon/16.png', 32: 'icon/32.png' },
     },
-    permissions: ['activeTab', 'scripting', 'storage', 'sidePanel', 'contextMenus'],
+    permissions: ['activeTab', 'storage', 'sidePanel', 'contextMenus'],
     // Anki export compiles the sql.js WebAssembly module in the side-panel page;
     // MV3 requires 'wasm-unsafe-eval' to allow WebAssembly. Still no remote code
     // (golden rule §4) — the wasm ships in the bundle and loads same-origin.
