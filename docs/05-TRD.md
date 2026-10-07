@@ -17,8 +17,8 @@
 | UI state | **Zustand** | Minimal global state for review session + settings; less ceremony than Redux. |
 | Local DB | **IndexedDB via Dexie** | Ergonomic, indexed queries, migrations, large quota. |
 | Scheduling | **FSRS** (`ts-fsrs`) | Modern, well-validated spaced-repetition algorithm; same family Anki adopted. |
-| Content extraction | **@mozilla/readability** + DOMPurify | Robust main-content extraction; sanitization of captured HTML. |
-| Markdown render | **markdown-it** (restricted) + DOMPurify | Render card content safely (no raw HTML injection). |
+| Content extraction | **@mozilla/readability** | Robust main-content extraction; only plain text crosses back into the extension. |
+| Content render | **React text rendering** | Escapes captured and generated strings by default; no raw HTML insertion. |
 | LLM access | Provider adapters over `fetch` | OpenAI / Anthropic / Google / Ollama; structured output + schema validation (Zod). |
 | Validation | **Zod** | Validate messages and LLM JSON output at every boundary. |
 | Anki export | `.apkg` writer (SQLite via `sql.js`/wasm) | Generate Anki packages client-side; optional AnkiConnect. |
@@ -34,12 +34,12 @@
 ## 2. Architecture
 
 ### 2.1 Overview
-Cramb is a **client-only, event-driven extension**. The background service worker is the brain (holds secrets, talks to providers, owns the DB-write path and scheduling); UI surfaces are thin clients that message the SW; the content script is a per-page agent for extraction and the capture toolbar.
+Cramb is a **client-only, event-driven extension**. The background service worker is the brain (holds secrets, talks to providers, owns the DB-write path and scheduling); UI surfaces are thin clients that message the SW; a packaged extractor is injected into the active page only after an explicit capture action.
 
 ```mermaid
 flowchart TB
     subgraph Page["Web page (per-tab)"]
-      CS[Content script: extractor + capture toolbar\n(isolated shadow-DOM UI)]
+      CS[On-demand Readability extractor\n(plain-text result only)]
     end
     subgraph UI["Extension UI (React)"]
       POP[Popup]
@@ -78,7 +78,7 @@ flowchart TB
 - **Repository layer wraps Dexie.** UI/SW never query Dexie directly; they go through typed repository functions (`cardRepo`, `deckRepo`, …). Keeps schema concerns in one place and makes migrations safe.
 - **Generation is orchestrated server-worker-side**, including chunking long content, enforcing the card cap, schema validation, and the single auto-repair retry.
 - **Side panel as primary workspace** (`chrome.sidePanel` on Chromium; sidebar action on Firefox) so review persists alongside browsing.
-- **Shadow-DOM for the in-page toolbar** so arbitrary page CSS can't break it and our CSS can't leak into the page.
+- **No persistent page agent.** Page extraction is a packaged script injected only after the user invokes capture; selection capture uses the browser context menu.
 - **MV3 service-worker lifecycle is ephemeral** — no in-memory state is assumed to persist; all durable state is in IndexedDB/`chrome.storage`; long generations are resilient to SW suspension (chunk + persist intermediate `source` first).
 
 ### 2.3 Folder structure (target)
@@ -131,7 +131,7 @@ There is no inbound server; nothing listens for external requests. (A sync ingre
 Security is a first-class requirement because Cramb handles a user secret (API key) and the content of everything they capture.
 
 ### 4.1 Secret handling
-- API key stored in `chrome.storage.local` under a dedicated key; **never** in IndexedDB, **never** in exports, **never** logged, **never** sent to content scripts/pages.
+- API key stored in `chrome.storage.local` under a dedicated key; **never** in IndexedDB, **never** in exports, **never** logged, **never** sent to injected extractors/pages.
 - Key read only at call time inside the SW; held in a local variable for the request, not cached globally beyond need.
 - Provide a one-click "remove key / wipe data" in Options.
 
@@ -141,13 +141,16 @@ Security is a first-class requirement because Cramb handles a user secret (API k
 - No remote code execution: MV3 forbids remote scripts; we ship all code in the bundle. No `eval`, no remote `<script>`.
 
 ### 4.3 Injection & rendering safety
-- Captured HTML sanitized with DOMPurify before extraction/storage.
-- Card markdown rendered through a restricted markdown-it config + DOMPurify (no raw HTML, safe links only).
-- The in-page toolbar is isolated in a shadow root; it reads selection text, not arbitrary page scripts.
+- Readability runs against a cloned document, and only extracted plain text is returned or stored; captured page HTML never crosses into the extension.
+- Captured and generated content is rendered as escaped text; no raw page or model HTML is inserted into extension UI.
+- Selection capture uses the browser's user-triggered context menu and receives selection text directly.
 
 ### 4.4 Permissions discipline
-- Prefer `activeTab` + on-demand `scripting` over broad host permissions.
-- Broad host access is **optional**, off by default, requested only if the user enables auto-capture everywhere.
+- Chromium MV3 uses `activeTab` plus an actively used `scripting` permission to
+  inject the packaged extractor after the user clicks capture. Firefox MV2 uses
+  `tabs.executeScript` and does not request `scripting`.
+- No persistent `<all_urls>` content script or optional broad host permission is
+  declared.
 - Document a justification for every permission (store-review ready).
 
 ### 4.5 Validation & supply chain

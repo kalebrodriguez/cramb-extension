@@ -51,6 +51,10 @@ Cramb needs access to an LLM to generate cards. You bring your own:
 
 ## Development
 
+V2 is currently in discovery. The market scan, feature options, validation
+thresholds, and delivery guardrails live in **[docs/v2/](docs/v2/README.md)**;
+no V2 feature set has been approved yet.
+
 ```bash
 pnpm dev          # launches Chromium with the extension loaded, with HMR
 pnpm dev:firefox  # same, in Firefox

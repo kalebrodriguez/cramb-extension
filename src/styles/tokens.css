@@ -89,7 +89,8 @@
   --border: var(--slate-200);
   --border-subtle: var(--slate-100);
   --text: var(--slate-900);
-  --text-muted: var(--slate-500);
+  /* Slate-500 is only 4.35:1 on the light background at normal text sizes. */
+  --text-muted: var(--slate-600);
   /* Darkened from slate-400 to clear WCAG AA (4.5:1) on the near-white bg.
      On light, "fainter" can't go lighter without failing AA, so faint sits
      just below muted. */

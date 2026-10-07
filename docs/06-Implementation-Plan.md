@@ -22,7 +22,7 @@
 - [ ] Options page: provider/key form + `model.test` round-trip to one provider.
 - [ ] "Hello card": hardcoded text → one provider call → schema-valid cards logged.
 
-**Exit criteria:** PR CI green; a real provider call returns schema-valid cards; key stored only in `chrome.storage.local` and never exposed to a content script (verified).
+**Exit criteria:** PR CI green; a real provider call returns schema-valid cards; key stored only in `chrome.storage.local` and never exposed to injected page code (verified).
 
 ---
 
@@ -30,8 +30,9 @@
 
 **Goal:** the core loop works end-to-end for articles. This is the "would I use it?" moment.
 
-- [x] Content script: Readability extraction + DOMPurify; selection capture.
-- [x] In-page capture toolbar (shadow-DOM) on selection + popup "Capture this page."
+- [x] User-triggered Readability extraction: runtime injection for page capture;
+  browser context menu for selection capture.
+- [x] Popup "Capture this page" action and side-panel handoff.
 - [x] Generation orchestrator: chunking, card cap, schema validation, one repair retry.
 - [x] Side panel: generated-card list with edit/delete/accept + deck picker.
 - [x] Persist sources + cards via repositories; auto-deck per source.
@@ -136,7 +137,7 @@ Rationale: prove the **generate→save** loop before investing in review UI; shi
 **Store submission**
 - [ ] Icons (16/32/48/128), screenshots, demo GIF.
 - [ ] Listing copy + privacy policy URL.
-- [ ] Per-permission justification text (activeTab, scripting, storage, sidePanel, host).
+- [ ] Per-permission justification text (`activeTab`, Chromium-only `scripting`, `storage`, `sidePanel`, `contextMenus`, exact provider/YouTube hosts).
 - [ ] Chrome Web Store developer account; Firefox AMO account.
 
 **Repo / OSS**

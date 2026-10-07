@@ -42,7 +42,6 @@
   --transition-duration-base: 200ms;
   --transition-duration-slow: 320ms;
 
-  --z-index-toolbar: 2147483000;
   --z-index-toast: 60;
   --z-index-modal: 50;
   --z-index-popover: 40;

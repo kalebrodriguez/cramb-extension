@@ -19,11 +19,11 @@
 These are hard invariants. If a task seems to require breaking one, **stop and flag it** instead.
 
 1. **Never ship or hardcode an API key.** No bundled/shared keys, ever. The user brings their own.
-2. **The API key is read ONLY in the background service worker.** Never pass it to a content script or page context. Never log it. Never put it in IndexedDB or any export.
+2. **The API key is read ONLY in the background service worker.** Never pass it to an injected extractor or page context. Never log it. Never put it in IndexedDB or any export.
 3. **Never send user content anywhere except the provider the user explicitly chose.** No analytics-by-default, no third-party calls, no "phone home." Egress is HTTPS only (or `localhost` for Ollama).
 4. **No remote code.** MV3-compliant: everything ships in the bundle. No `eval`, no remote `<script>`, no dynamic code loading.
 5. **Generated cards are ALWAYS shown for edit before saving.** Never auto-commit model output to a deck.
-6. **Treat all LLM output and page HTML as untrusted.** Validate model JSON with Zod; sanitize HTML with DOMPurify; render markdown through the restricted renderer.
+6. **Treat all LLM output and page HTML as untrusted.** Validate model JSON with Zod; return plain text from extraction; never render raw page or model HTML.
 7. **Never reference raw hex/spacing in components.** Use design tokens (CSS vars / Tailwind theme) from `03-UI-UX-Design-System.md`.
 8. **Never bypass the repository layer.** UI and SW touch data only through typed repositories, never Dexie directly.
 9. **Respect `prefers-reduced-motion` and keyboard a11y** in every new UI.
@@ -34,10 +34,10 @@ These are hard invariants. If a task seems to require breaking one, **stop and f
 ## 3. Tech stack (authoritative — keep versions pinned here)
 - **Language:** TypeScript, `strict: true`. No `any` (use `unknown` + narrowing).
 - **Extension framework:** WXT (MV3, Vite, cross-browser).
-- **UI:** React 18 + Tailwind CSS; **Zustand** for state.
+- **UI:** React 19 + Tailwind CSS; **Zustand** for state.
 - **Data:** IndexedDB via **Dexie**; settings + secret in `chrome.storage.local`.
 - **Scheduling:** `ts-fsrs`.
-- **Extraction/render:** `@mozilla/readability`, `markdown-it` (restricted), **DOMPurify**.
+- **Extraction/render:** `@mozilla/readability`; plain-text extraction and React's escaped text rendering.
 - **Validation:** **Zod** at every boundary.
 - **LLM:** provider adapters over `fetch` (OpenAI / Anthropic / Google / Ollama) with structured output.
 - **Export:** `.apkg` via `sql.js` (wasm); optional AnkiConnect.
@@ -51,18 +51,18 @@ These are hard invariants. If a task seems to require breaking one, **stop and f
 ## 4. Folder structure (where things go)
 ```
 src/
-  background/   service worker: message hub, generation, scheduler, providers/
-  content/      extractor + capture toolbar (shadow-DOM React root)
-  ui/           popup/ side-panel/ options/ onboarding/ + components/
+  background/   service-worker modules: generation, scheduler, providers/, sources/
+  entrypoints/  background, popup, sidepanel, options, onboarding, unlisted extractor
+  components/   shared React components
   data/         dexie db, repositories, migrations, zod schemas
   lib/          message types, errors, tokens, shared utils
   styles/       tailwind + token CSS
 tests/          vitest + playwright
 docs/           the 6 product/eng docs
 ```
-- New **content source**? → `background/` source adapter + `content/` extractor hook. Self-contained.
+- New **content source**? → `background/sources/` adapter and, only when page execution is required, a narrowly scoped unlisted entrypoint. Self-contained.
 - New **model provider**? → `background/providers/<name>.ts` implementing `LLMProvider`. Self-contained.
-- New **UI component**? → `ui/components/`, token-driven, with a11y + states.
+- New **UI component**? → `components/` or the owning entrypoint, token-driven, with a11y + states.
 
 ---
 
@@ -88,12 +88,13 @@ docs/           the 6 product/eng docs
 ---
 
 ## 7. Current status (UPDATE EACH SESSION)
-- **Phase:** M5 in progress — launch hardening. M0–M4 complete; M5 onboarding, toasts, theme (dark/light/system), and the automated a11y (axe) gate have landed. Now closing docs/repo-hygiene and cross-browser gaps for a believable v1.
+- **Phase:** V2 discovery after the v1.0.1 store-permission correction. Production V2 feature work has not started; the current branch contains a research and validation scaffold only.
 - **What's done:** 
   - WXT + React + Tailwind v4 scaffold; Dexie DB + repository layer.
   - Zod schemas for all entities + messages + LLM output.
   - All 4 provider adapters (OpenAI, Anthropic, Google, Ollama).
-  - DOM extraction via `@mozilla/readability` and `DOMPurify` to content script.
+  - User-triggered page extraction via a bundled `@mozilla/readability` script;
+    plain text only crosses back into the extension.
   - End-to-end "capture this page" and "capture selection" flow.
   - Background generation orchestrator logic to chunk large texts.
   - Sidepanel UI that displays extracted cards, allows the user to edit/delete/save them.
@@ -107,10 +108,21 @@ docs/           the 6 product/eng docs
   - M5: onboarding wizard (`src/entrypoints/onboarding/`), non-blocking toasts (`lib/toast.ts` + `ToastViewport`), theme system (`lib/theme.ts`, dark/light/system), automated axe a11y gate (Playwright e2e over all surfaces, WCAG 2.1 AA, in CI).
   - Repo hygiene: `SECURITY.md`, `CHANGELOG.md`, issue/PR templates; README reconciled with shipped features.
   - Cross-browser: `lib/side-panel.ts` `openWorkspace()` feature-detects `chrome.sidePanel` (Chromium) vs `sidebarAction` (Firefox), with a tab fallback — no more Firefox `TypeError` on panel open.
-- **Next action:** finish M5 launch hardening — provider retry/backoff on 429/5xx (+tests); in-repo store-readiness docs (permission justifications, release checklist); then store submission. Deferred past v1: backend/accounts, sync, AnkiConnect.
-- **Last updated:** 2026-06-23.
+  - Store correction: v1.0.1 removed the unused `scripting` permission. The V2
+    capture spike now actively uses `scripting` on Chromium MV3, uses the MV2
+    fallback on Firefox, and removes persistent/optional `<all_urls>` access.
+  - V2 discovery: `docs/v2/` contains the ranked feature options, delivery scaffold, validation plan, and decision log. No V2 feature set is approved yet.
+- **Next action:** manually smoke-test capture in Chromium and Firefox, then
+  choose the first small V2 vertical slice from the discovery evidence.
+- **Last updated:** 2026-10-07.
 
 ### Changelog of context
+- 2026-10-07 — Completed the D-003 capture-permission spike: removed the
+  persistent `<all_urls>` content script, added explicit on-demand extraction,
+  scoped `scripting` to Chromium MV3, retained the Firefox MV2 fallback, and
+  added focused tests plus store-ready permission documentation. The full a11y
+  gate also caught and fixed light-theme `--text-muted` contrast (4.35:1 to AA).
+- 2026-10-06 — Started V2 discovery. Added the option matrix and validation scaffold, synchronized store-permission documentation with v1.0.1, and removed the unused optional `<all_urls>` declaration. No feature code added.
 - 2026-06-20 — Initial product + engineering docs written; stack and architecture chosen.
 - 2026-06-20 — M0 scaffold complete. WXT 0.20.26, React 19, Tailwind v4, Dexie 4, Zod 4, ts-fsrs 5.4, TypeScript 6. Build succeeds for Chromium. 15 tests pass.
 - 2026-06-20 — Validated niche, renamed project to "Cramb". M1 feature loop implemented (extraction -> chunked generation -> editable card queue -> local save).
