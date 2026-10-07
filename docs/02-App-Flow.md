@@ -9,17 +9,18 @@
 
 ## 1. Surfaces (where the UI lives)
 
-A browser extension is not a single screen — it's a set of surfaces. Cramb uses five:
+A browser extension is not a single screen — it's a set of surfaces. Cramb uses four:
 
 | Surface | Tech | Purpose |
 |---------|------|---------|
-| **In-page capture toolbar** | Content script (injected) | Appears on text selection / page action; the entry point to capture. |
 | **Popup** | Extension popup | Quick status: due-count, "Review now", "Capture this page", settings link. |
 | **Side panel** | `chrome.sidePanel` / Firefox sidebar | The main workspace: card review, generated-card editing, decks. |
 | **Options page** | Extension page (full tab) | Settings: provider/key, limits, theme, data import/export. |
 | **Onboarding page** | Extension page (full tab) | First-run setup wizard. |
 
-Navigation principle: **capture happens in-page; everything else happens in the side panel.** The popup is a launcher, not a workspace.
+Navigation principle: **capture starts from the popup or selection context menu;
+everything else happens in the side panel.** The popup is a launcher, not a
+workspace.
 
 ---
 
@@ -96,7 +97,7 @@ flowchart LR
 
 **Rules (enforced; see CLAUDE.md guardrails):**
 - The API key is written to `chrome.storage.local` (device-local, not synced).
-- The key is **only** read inside the background service worker, **never** exposed to content scripts or page context, and **never** logged.
+- The key is **only** read inside the background service worker, **never** exposed to an injected extractor or page context, and **never** logged.
 - All model calls originate from the background SW over HTTPS (or `http://localhost` for Ollama).
 - Switching providers is non-destructive — cards/decks are provider-agnostic.
 
@@ -108,9 +109,9 @@ The single most important flow. Two entry points converge.
 
 ```mermaid
 flowchart TD
-    E1[Select text on page] --> T[Capture toolbar appears]
-    E2[Click 'Capture page' in popup] --> X[Content script extracts main content]
-    T -->|Make cards from selection| G
+    E1[Select text on page] --> T[Right-click 'Make cards from selection']
+    E2[Click 'Capture page' in popup] --> X[On-demand extractor reads main content]
+    T --> G
     X --> G[Background: build prompt within token budget]
     G --> LLM[LLM generates structured cards]
     LLM -->|valid JSON| R[Side panel: generated cards in editable list]

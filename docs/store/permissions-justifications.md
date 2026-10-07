@@ -11,7 +11,7 @@ and requests the minimum needed for the capture → generate → review loop.
 | Permission | Why it's needed |
 |---|---|
 | `activeTab` | To read the current tab's URL/title when the user clicks "Capture this page" or "Capture this video," so the captured source can be attributed. Grants access only to the tab the user acted on. |
-| `scripting` | To run the Readability extractor in the page on an explicit capture, pulling the article text the user chose to turn into cards. Only runs on user action. |
+| `scripting` (Chromium MV3 only) | To inject Cramb's packaged, local article extractor into the active tab after the user clicks "Capture this page." It is not used for background or automatic page access. Firefox MV2 uses its existing `tabs.executeScript` API and does not request this permission. |
 | `storage` | To store the user's settings and their library (decks/cards/reviews live in IndexedDB; the API key lives in `chrome.storage.local`). Nothing is sent to us — there is no backend. |
 | `sidePanel` | To open Cramb's review/management workspace in the browser side panel. (Firefox uses the equivalent `sidebar_action`.) |
 | `contextMenus` | To add the right-click "Make cards from selection" item, the reliable way to capture highlighted text and open the workspace from a user gesture. |
@@ -30,11 +30,14 @@ only to the provider they select.
 | `http://localhost:11434/*` | Talk to a **local** Ollama instance — never leaves the user's machine. |
 | `https://www.youtube.com/*` | Fetch a video's transcript when the user clicks "Capture this video." |
 
-## `optional_host_permissions`: `<all_urls>`
+## Page extraction access
 
-Requested **optionally** (not granted by default) so the user can capture an
-article from an arbitrary site. The browser prompts for this at the moment of
-capture; Cramb never reads pages in the background.
+Cramb does not register a persistent `<all_urls>` content script. After the user
+clicks "Capture this page," Chromium temporarily grants the active tab through
+`activeTab`, and Cramb calls `scripting.executeScript` to run its packaged
+extractor. Firefox uses the equivalent MV2 `tabs.executeScript` path. The
+extractor returns readable plain text only; Cramb does not capture pages
+automatically or in the background.
 
 ## Content Security Policy
 

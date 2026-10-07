@@ -3,6 +3,7 @@ import { MessageSchema } from '@/lib/messages';
 import { ok, err, type Result } from '@/lib/errors';
 import { getProvider } from '@/background/providers';
 import { openWorkspace } from '@/lib/side-panel';
+import { extractPageFromTab } from '@/background/sources/page';
 
 /** SHA-256 hex digest of a string, used to de-duplicate captured content. */
 async function sha256Hex(text: string): Promise<string> {
@@ -14,8 +15,8 @@ async function sha256Hex(text: string): Promise<string> {
 
 /**
  * Persist a highlighted-text selection as a source, ensure a deck exists, and
- * notify the side panel. Shared by the in-page "Make cards" pill
- * (`capture.fromSelection`) and the right-click context menu.
+ * notify the side panel. Used by the typed `capture.fromSelection` message and
+ * the right-click context menu.
  */
 async function captureSelection(text: string, url: string, title: string) {
   const { sourceRepo, deckRepo } = await import('@/data/repositories');
@@ -49,7 +50,7 @@ export default defineBackground(() => {
 
   // Right-click "Make cards from selection" — the reliable way to capture a
   // highlight and open the side panel (the menu click carries the user gesture
-  // sidePanel.open() requires; the in-page pill can't).
+  // sidePanel.open() requires).
   const SELECTION_MENU_ID = 'cramb-make-cards';
   chrome.runtime.onInstalled.addListener((details) => {
     // removeAll first so re-installs/updates don't throw on a duplicate id.
@@ -93,7 +94,7 @@ export default defineBackground(() => {
         
         let tabId = sender.tab?.id;
         
-        // If not sent from a content script (e.g. from popup), we need to find the active tab
+        // Popup requests do not carry a sender tab, so resolve the active tab.
         if (!tabId) {
           const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
           tabId = tabs[0]?.id;
@@ -104,17 +105,14 @@ export default defineBackground(() => {
         }
         
         try {
-          // Ask the content script to extract the page
-          const extraction: unknown = await chrome.tabs.sendMessage(tabId, { type: 'extractPage' }).catch(err => {
-            return { error: String(err) };
-          });
-          
-          if (!extraction || typeof extraction !== 'object' || 'error' in extraction) {
-            const errObj = extraction as { error?: string };
-            return err('EXTRACTION_EMPTY', errObj?.error || 'Failed to extract content from page.');
+          // Inject the bundled extractor only after the user invokes capture.
+          const extraction = await extractPageFromTab(tabId);
+
+          if ('error' in extraction) {
+            return err('EXTRACTION_EMPTY', extraction.error);
           }
 
-          const { title, byline, textContent } = extraction as { title?: string, byline?: string, textContent?: string };
+          const { title, byline, textContent } = extraction;
 
           if (!textContent || textContent.trim().length === 0) {
             return err('EXTRACTION_EMPTY', 'No text content could be extracted from this page.');
@@ -157,12 +155,9 @@ export default defineBackground(() => {
       }
 
       case 'capture.fromSelection': {
-        // Note: this path can't open a closed side panel — sidePanel.open() only
-        // works from a real user gesture (action/contextMenu/command), not from a
-        // message forwarded by a content script. When the panel is already open,
-        // the CAPTURE_COMPLETE broadcast switches it to the capture view; when
-        // it's closed, the right-click "Make cards from selection" menu (which
-        // does open it) is the reliable entry point.
+        // This message path cannot open a closed side panel because
+        // sidePanel.open() requires a browser-recognized user gesture. The
+        // context-menu path above is the reliable user-facing entry point.
         try {
           const source = await captureSelection(msg.payload.text, msg.payload.url, msg.payload.title);
           return ok(source);

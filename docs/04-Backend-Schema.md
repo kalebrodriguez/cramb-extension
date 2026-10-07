@@ -228,7 +228,7 @@ Surfaces communicate with the background service worker via typed messages (`chr
 ```ts
 type Msg =
   | { type: 'capture.fromSelection'; payload: { text: string; url: string; title: string } }
-  | { type: 'capture.fromPage';      payload: { url: string } }            // SW asks content script to extract
+  | { type: 'capture.fromPage';      payload: { url: string } }            // SW injects the packaged extractor on demand
   | { type: 'generate.cards';        payload: { sourceId: string; options: GenOptions } }
   | { type: 'cards.save';            payload: { deckId: string; cards: NewCard[] } }
   | { type: 'review.next';           payload: { deckId?: string } }
@@ -309,15 +309,21 @@ Adapters normalize provider-specific request/response shapes and surface a unifo
 ### 8.1 Extension permissions (justified for store review)
 | Permission | Why | Scope discipline |
 |-----------|-----|------------------|
-| `activeTab` | Read current tab content on user action (capture). | Preferred over broad host perms. |
-| `scripting` | Inject the content extractor / toolbar on demand. | Only on user action. |
+| `activeTab` | Read the current tab URL/title after the user invokes capture. | Temporary access tied to the user gesture. |
+| `scripting` (Chromium MV3 only) | Inject the packaged article extractor after "Capture this page." | Called only for the active tab after the explicit capture action; Firefox MV2 uses `tabs.executeScript`. |
 | `storage` | Settings + IndexedDB-adjacent prefs. | — |
 | `sidePanel` | The workspace surface. | — |
-| optional host permissions (`<all_urls>`) | Only if user enables "capture without clicking on any site". | **Optional**, requested on demand, off by default. |
+| `contextMenus` | Add the user-triggered selection capture action. | Selection context only. |
 | host: provider API domains | Background → provider HTTPS calls. | Exact domains per provider; `localhost` for Ollama. |
 
+The V2 capture prototype removes the persistent `<all_urls>` content script and
+the redundant optional `<all_urls>` declaration. Chromium MV3 now actively uses
+`scripting` for an on-demand injection after the user clicks capture. The
+Firefox MV2 artifact omits `scripting` and uses `tabs.executeScript` under the
+temporary `activeTab` grant.
+
 ### 8.2 Data-access invariants (security)
-1. The API key is read **only** in the background SW; content scripts and page contexts never receive it.
+1. The API key is read **only** in the background SW; injected extractors and page contexts never receive it.
 2. Captured content and cards never leave the device **except** the specific text sent to the user-chosen provider for generation (clearly disclosed).
 3. No third-party analytics by default; opt-in only, and never includes card/source content.
 4. All external calls are HTTPS (or `localhost` for Ollama).

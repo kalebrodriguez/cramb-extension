@@ -99,7 +99,7 @@ Dark mode is the **default** (people study at night; it's easier on the eyes). L
   --border-subtle: var(--slate-800);
   --text:          var(--slate-50);
   --text-muted:    var(--slate-400);
-  --text-faint:    var(--slate-500);
+  --text-faint:    #8b97ac;
   --brand:         var(--violet-400);
   --brand-strong:  var(--violet-500);
   --on-brand:      var(--slate-0);
@@ -116,8 +116,8 @@ Dark mode is the **default** (people study at night; it's easier on the eyes). L
   --border:        var(--slate-200);
   --border-subtle: var(--slate-100);
   --text:          var(--slate-900);
-  --text-muted:    var(--slate-500);
-  --text-faint:    var(--slate-400);
+  --text-muted:    var(--slate-600);
+  --text-faint:    #5c6b81;
   --brand:         var(--violet-600);
   --brand-strong:  var(--violet-700);
   --on-brand:      var(--slate-0);
@@ -171,7 +171,6 @@ Usage: UI chrome uses `--font-sans`. Card *content* may use `--font-serif` for r
 /* All transitions disabled when prefers-reduced-motion: reduce */
 
 /* Z-index */
---z-toolbar: 2147483000; /* in-page toolbar must beat most page content */
 --z-toast: 60; --z-modal: 50; --z-popover: 40;
 ```
 
@@ -213,22 +212,17 @@ Each component lists: purpose, variants, states, and a11y notes. These map 1:1 t
 - Keyboard `1–4`. Selected state animates a subtle scale (respecting reduced-motion).
 - **a11y:** grouped with `role="group"` + `aria-label="Grade your recall"`.
 
-### 3.4 In-page capture toolbar
-- A small floating pill that appears near a text selection: `✦ Make cards` + a caret menu (cards / cloze / quiz).
-- Must visually survive on *any* site → high z-index, shadow-lg, its own shadow-DOM container to avoid page CSS bleed.
-- Auto-dismiss on click-away or `Esc`.
-
-### 3.5 Generated-card list item
+### 3.4 Generated-card list item
 - Editable card preview: front/back fields, type badge (Basic / Cloze / MCQ), delete, and an "accept" check. Bulk actions: accept all, deck picker.
 - Inline validation (empty front/back disables save for that card).
 
-### 3.6 Deck list item
+### 3.5 Deck list item
 - Deck name, card count, due count (amber pill), small progress ring, overflow menu (rename, export, delete).
 
-### 3.7 Source badge / item
+### 3.6 Source badge / item
 - Favicon + title + captured-at, links back to the URL (and timestamp for videos).
 
-### 3.8 Supporting components
+### 3.7 Supporting components
 - **Progress ring** (due/cap), **Tag chip**, **Toast** (`aria-live`), **Empty state** (illustration + one CTA), **Setting field** (label, help text, control, error), **Provider/key field** (masked input + "test" button + status dot), **Streak indicator**, **Modal/confirm**, **Skeleton loaders** for generation latency.
 
 ---
@@ -250,15 +244,7 @@ Each component lists: purpose, variants, states, and a11y notes. These map 1:1 t
 └──────────────────────────────┘
 ```
 
-### 4.2 In-page capture toolbar (on selection)
-```
-        ┌─────────────────────────────┐
-  …text │ ✦ Make cards  ▾ │  ✕         │
-        └─────────────────────────────┘
-                 ▾ menu: Q&A · Cloze · Quiz
-```
-
-### 4.3 Side panel — review
+### 4.2 Side panel — review
 ```
 ┌───────────────────────────┐
 │ Review · Deck: React Hooks │
@@ -280,7 +266,7 @@ Each component lists: purpose, variants, states, and a11y notes. These map 1:1 t
 └───────────────────────────┘
 ```
 
-### 4.4 Side panel — generated cards (post-capture)
+### 4.3 Side panel — generated cards (post-capture)
 ```
 ┌───────────────────────────┐
 │ 8 cards from "Big-O Guide" │
@@ -300,7 +286,7 @@ Each component lists: purpose, variants, states, and a11y notes. These map 1:1 t
 └───────────────────────────┘
 ```
 
-### 4.5 Options — model & key
+### 4.4 Options — model & key
 ```
 ┌──────────────────────────────────────┐
 │ Settings ▸ Model & key                │
@@ -319,7 +305,10 @@ Each component lists: purpose, variants, states, and a11y notes. These map 1:1 t
 ---
 
 ## 5. High-fidelity mockups
-The interactive, on-brand rendering of the popup, review panel, capture toolbar, and generated-card list lives in **`docs/design/mockup.html`** — open it in a browser. It uses the exact tokens above and supports the dark (default) and light themes, so it doubles as a living visual reference for contributors.
+The interactive, on-brand rendering of the popup, review panel, and
+generated-card list lives in **`docs/design/mockup.html`** — open it in a
+browser. The mockup still contains an archived toolbar concept that is not part
+of the current product; selection capture now uses the browser context menu.
 
 ---
 
